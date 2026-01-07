@@ -1,0 +1,9 @@
+{
+  "platforms": ["apple", "android", "web"],
+  "apple": {
+    "modules": ["AiAssistantModule"]
+  },
+  "android": {
+    "modules": ["expo.modules.aiassistant.AiAssistantModule"]
+  }
+}
