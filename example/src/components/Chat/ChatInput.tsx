@@ -1,0 +1,167 @@
+import React, { useState } from 'react';
+import { View, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, I18nManager } from 'react-native';
+import { Send, Mic } from 'lucide-react-native';
+import { Locale } from '../../contexts/LocaleContext';
+
+interface ChatInputProps {
+    onSend: (text: string) => void;
+    isLoading?: boolean;
+    isTranscribing?: boolean;
+    onStartRecording?: () => void;
+    onStopRecording?: () => void;
+    isRecording?: boolean;
+    locale?: Locale;
+    isRTL?: boolean;
+}
+
+export function ChatInput({
+    onSend,
+    isLoading,
+    isTranscribing,
+    onStartRecording,
+    onStopRecording,
+    isRecording,
+    locale = 'en',
+    isRTL = false,
+}: ChatInputProps) {
+    const [text, setText] = useState('');
+
+    // Disable input when loading response or transcribing voice
+    const isDisabled = isLoading || isTranscribing;
+
+    const handleSend = () => {
+        if (!text.trim() || isDisabled) return;
+        onSend(text.trim());
+        setText('');
+    };
+
+    // Localized placeholder text
+    const placeholder = isTranscribing
+        ? (locale === 'ar' ? 'جاري التحويل...' : 'Transcribing...')
+        : (locale === 'ar' ? 'اكتب رسالة...' : 'Type a message...');
+
+    return (
+        <View style={[styles.container, isDisabled && styles.containerDisabled]}>
+            <View style={[
+                styles.inputContainer,
+                isDisabled && styles.inputContainerDisabled,
+                isRTL && styles.inputContainerRTL,
+            ]}>
+                <TextInput
+                    style={[
+                        styles.input,
+                        isDisabled && styles.inputDisabled,
+                        isRTL && styles.inputRTL,
+                    ]}
+                    placeholder={placeholder}
+                    placeholderTextColor={isDisabled ? "#C0C4CC" : "#9CA3AF"}
+                    value={text}
+                    onChangeText={setText}
+                    onSubmitEditing={handleSend}
+                    returnKeyType="send"
+                    multiline
+                    editable={!isDisabled}
+                    textAlign={isRTL ? 'right' : 'left'}
+                />
+
+                {text.length > 0 ? (
+                    <TouchableOpacity
+                        style={[
+                            styles.button,
+                            styles.sendButton,
+                            isDisabled && styles.buttonDisabled
+                        ]}
+                        onPress={handleSend}
+                        disabled={isDisabled}
+                    >
+                        {isLoading ? (
+                            <ActivityIndicator color="#fff" size="small" />
+                        ) : (
+                            <Send size={20} color="#fff" style={isRTL ? { transform: [{ scaleX: -1 }] } : undefined} />
+                        )}
+                    </TouchableOpacity>
+                ) : (
+                    <TouchableOpacity
+                        style={[
+                            styles.button,
+                            styles.micButton,
+                            isRecording && styles.recordingButton,
+                            isDisabled && !isRecording && styles.micButtonDisabled
+                        ]}
+                        onPressIn={isDisabled ? undefined : onStartRecording}
+                        onPressOut={isDisabled ? undefined : onStopRecording}
+                        disabled={isDisabled && !isRecording}
+                    >
+                        {isTranscribing ? (
+                            <ActivityIndicator color="#6B7280" size="small" />
+                        ) : (
+                            <Mic size={20} color={isRecording ? "#fff" : isDisabled ? "#C0C4CC" : "#6B7280"} />
+                        )}
+                    </TouchableOpacity>
+                )}
+            </View>
+        </View>
+    );
+}
+
+const styles = StyleSheet.create({
+    container: {
+        padding: 16,
+        backgroundColor: '#fff',
+        borderTopWidth: 1,
+        borderTopColor: '#F3F4F6',
+    },
+    containerDisabled: {
+        opacity: 0.7,
+    },
+    inputContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#F3F4F6',
+        borderRadius: 24,
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        gap: 12,
+    },
+    inputContainerRTL: {
+        flexDirection: 'row-reverse',
+    },
+    inputContainerDisabled: {
+        backgroundColor: '#E5E7EB',
+    },
+    input: {
+        flex: 1,
+        fontSize: 16,
+        maxHeight: 100,
+        color: '#1F2937',
+        paddingVertical: 8,
+    },
+    inputRTL: {
+        writingDirection: 'rtl',
+    },
+    inputDisabled: {
+        color: '#9CA3AF',
+    },
+    button: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    buttonDisabled: {
+        opacity: 0.5,
+    },
+    sendButton: {
+        backgroundColor: '#4F46E5',
+    },
+    micButton: {
+        backgroundColor: '#E5E7EB',
+    },
+    micButtonDisabled: {
+        backgroundColor: '#F3F4F6',
+    },
+    recordingButton: {
+        backgroundColor: '#EF4444',
+    },
+});

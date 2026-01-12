@@ -1,7 +1,7 @@
 {
   "name": "ai-assistant",
   "version": "0.1.0",
-  "description": "Ai Assistant",
+  "description": "AI Assistant SDK for React Native - Embeddable chat interface with voice support",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "scripts": {
@@ -13,13 +13,20 @@
     "prepublishOnly": "expo-module prepublishOnly",
     "expo-module": "expo-module",
     "open:ios": "xed example/ios",
-    "open:android": "open -a \"Android Studio\" example/android"
+    "open:android": "open -a \"Android Studio\" example/android",
+    "android": "expo run:android",
+    "ios": "expo run:ios"
   },
   "keywords": [
     "react-native",
     "expo",
     "ai-assistant",
-    "AiAssistant"
+    "chat",
+    "voice",
+    "tts",
+    "stt",
+    "arabic",
+    "rtl"
   ],
   "repository": "https://github.com/MoaazELDemery/ai-assistant",
   "bugs": {
@@ -28,16 +35,30 @@
   "author": "Moaaz El Demery <108753264+MoaazELDemery@users.noreply.github.com> (https://github.com/MoaazELDemery)",
   "license": "MIT",
   "homepage": "https://github.com/MoaazELDemery/ai-assistant#readme",
-  "dependencies": {},
   "devDependencies": {
     "@types/react": "~19.1.0",
+    "expo": "^54.0.31",
     "expo-module-scripts": "^5.0.8",
-    "expo": "^54.0.27",
     "react-native": "0.81.5"
   },
   "peerDependencies": {
     "expo": "*",
+    "expo-av": "*",
+    "expo-file-system": "*",
     "react": "*",
-    "react-native": "*"
+    "react-native": "*",
+    "react-native-safe-area-context": "*",
+    "@react-native-async-storage/async-storage": "*",
+    "lucide-react-native": "*"
+  },
+  "peerDependenciesMeta": {
+    "lucide-react-native": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "expo": "~54.0.31",
+    "react": "19.1.0",
+    "react-native": "0.81.5"
   }
 }
