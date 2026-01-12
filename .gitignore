@@ -31,7 +31,6 @@ ios/*.xcworkspace
 ios/Podfile.lock
 
 # TypeScript
-lib/
 *.tsbuildinfo
 
 # Testing
