@@ -1,0 +1,70 @@
+import { Card } from '../types';
+
+export const mockCards: Card[] = [
+    {
+        id: 'card-001',
+        name: 'Platinum Credit Card',
+        nameAr: 'بطاقة الائتمان البلاتينية',
+        type: 'credit',
+        lastFourDigits: '4521',
+        cardNumber: '**** **** **** 4521',
+        expiryDate: '12/27',
+        status: 'active',
+        linkedAccountId: 'acc-001',
+        limits: {
+            dailyLimit: 50000,
+            transactionLimit: 20000,
+            currentDailyUsage: 12500,
+        },
+        settings: {
+            internationalTransactions: true,
+            onlineTransactions: true,
+            contactlessPayments: true,
+        },
+        cardNetwork: 'visa',
+    },
+    {
+        id: 'card-002',
+        name: 'Debit Card',
+        nameAr: 'بطاقة الصراف الآلي',
+        type: 'debit',
+        lastFourDigits: '8834',
+        cardNumber: '**** **** **** 8834',
+        expiryDate: '09/26',
+        status: 'active',
+        linkedAccountId: 'acc-002',
+        limits: {
+            dailyLimit: 15000,
+            transactionLimit: 5000,
+            currentDailyUsage: 3200,
+        },
+        settings: {
+            internationalTransactions: false,
+            onlineTransactions: true,
+            contactlessPayments: true,
+        },
+        cardNetwork: 'mada',
+    },
+    {
+        id: 'card-003',
+        name: 'Gold Credit Card',
+        nameAr: 'بطاقة الائتمان الذهبية',
+        type: 'credit',
+        lastFourDigits: '2156',
+        cardNumber: '**** **** **** 2156',
+        expiryDate: '06/28',
+        status: 'frozen',
+        linkedAccountId: 'acc-001',
+        limits: {
+            dailyLimit: 30000,
+            transactionLimit: 15000,
+            currentDailyUsage: 0,
+        },
+        settings: {
+            internationalTransactions: true,
+            onlineTransactions: false,
+            contactlessPayments: true,
+        },
+        cardNetwork: 'mastercard',
+    },
+];

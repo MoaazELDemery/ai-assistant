@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     primaryButtonText: {
-        color: '#4F46E5', // Primary color
+        color: '#4F008D', // Primary color
         fontSize: 14,
         fontWeight: '600',
     },

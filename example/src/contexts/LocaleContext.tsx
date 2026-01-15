@@ -15,10 +15,10 @@ const translations: Record<Locale, Record<string, string>> = {
     en: {
         // Header
         'header.greeting': 'Good morning',
-        'header.aiAssistant': 'AI Assistant',
+        'header.aiAssistant': 'STC AI Assistant',
 
         // Chat
-        'chat.title': 'AI Assistant',
+        'chat.title': 'STC AI Assistant',
         'chat.placeholder': 'Type a message...',
         'chat.transcribing': 'Transcribing...',
         'chat.send': 'Send',
@@ -82,10 +82,10 @@ const translations: Record<Locale, Record<string, string>> = {
     ar: {
         // Header
         'header.greeting': 'صباح الخير',
-        'header.aiAssistant': 'المساعد الذكي',
+        'header.aiAssistant': 'مساعد STC الذكي',
 
         // Chat
-        'chat.title': 'المساعد الذكي',
+        'chat.title': 'مساعد STC الذكي',
         'chat.placeholder': 'اكتب رسالة...',
         'chat.transcribing': 'جاري التحويل...',
         'chat.send': 'إرسال',
@@ -152,8 +152,14 @@ const LOCALE_STORAGE_KEY = '@ai_assistant_locale';
 
 const LocaleContext = createContext<LocaleContextType | undefined>(undefined);
 
-export function LocaleProvider({ children }: { children: ReactNode }) {
-    const [locale, setLocaleState] = useState<Locale>('en');
+export function LocaleProvider({
+    children,
+    initialLocale = 'en'
+}: {
+    children: ReactNode;
+    initialLocale?: Locale;
+}) {
+    const [locale, setLocaleState] = useState<Locale>(initialLocale);
     const [isReady, setIsReady] = useState(false);
 
     // Load saved locale on mount

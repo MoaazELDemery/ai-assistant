@@ -91,6 +91,33 @@ export interface ChatMessage {
     beneficiaries?: Beneficiary[];
     // Legacy support
     transferPreview?: TransferPreview;
+    // Additional data fields
+    cards?: Card[];
+    bills?: Bill[];
+    spendingBreakdown?: SpendingBreakdown[];
+    subscriptions?: Subscription[];
+    spendingInsights?: SpendingInsight[];
+    // Recommendations
+    recommendations?: Recommendation[];
+    recommendationsIntro?: string;
+    recommendationsIntroAr?: string;
+}
+
+// Recommendation type for personalized offers
+export interface Recommendation {
+    id: string;
+    title: string;
+    titleAr: string;
+    description: string;
+    descriptionAr: string;
+    ctaQuestion: string;
+    ctaQuestionAr: string;
+    features: string[];
+    featuresAr: string[];
+    badges: Array<{ text: string; textAr: string; variant: 'special' | 'category' }>;
+    icon: 'savings' | 'piggybank' | 'target' | 'trending' | 'creditcard';
+    actionLabel?: string;
+    actionLabelAr?: string;
 }
 
 export interface TransferPreview {

@@ -1,36 +1,65 @@
 import React from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Bot, User, Volume2, VolumeX } from 'lucide-react-native';
-import { ChatMessage as ChatMessageType } from '../../types';
+import { ChatMessage as ChatMessageType, Account, Beneficiary, Card, Bill, SpendingBreakdown, Subscription, Recommendation } from '../../types';
 import { SimpleMarkdownRenderer } from './SimpleMarkdownRenderer';
 import { Locale } from '../../contexts/LocaleContext';
 
 interface ChatMessageProps {
     message: ChatMessageType;
+    accounts?: Account[];
+    beneficiaries?: Beneficiary[];
+    cards?: Card[];
+    bills?: Bill[];
+    spendingBreakdown?: SpendingBreakdown[];
+    subscriptions?: Subscription[];
+    locale?: Locale;
     onAction?: (action: string) => void;
-    // Handler props...
-    onAccountSelect?: (account: any) => void;
-    onBeneficiarySelect?: (beneficiary: any) => void;
+    onAccountSelect?: (account: Account) => void;
+    onBeneficiarySelect?: (beneficiary: Beneficiary) => void;
+    onCardSelect?: (card: Card) => void;
+    onBillSelect?: (bill: Bill) => void;
     onTransferConfirm?: () => void;
     onTransferEdit?: () => void;
     onTransferCancel?: () => void;
+    onCardActionConfirm?: () => void;
+    onCardActionCancel?: () => void;
+    onBillPaymentConfirm?: () => void;
+    onBillPaymentCancel?: () => void;
+    // Recommendation handlers
+    onRecommendationApply?: (recommendation: Recommendation) => void;
+    onRecommendationDetails?: (recommendation: Recommendation) => void;
     // Speech props
     onSpeechToggle?: (text: string, messageId: string) => void;
     isSpeaking?: boolean;
     isLoadingSpeech?: boolean;
     currentSpeakingMessageId?: string | null;
-    // Locale props
-    locale?: Locale;
+    // RTL prop
     isRTL?: boolean;
 }
 
 export function ChatMessage({
     message,
+    accounts: fallbackAccounts = [],
+    beneficiaries: fallbackBeneficiaries = [],
+    cards: fallbackCards = [],
+    bills: fallbackBills = [],
+    spendingBreakdown: fallbackSpendingBreakdown = [],
+    subscriptions: fallbackSubscriptions = [],
+    onAction,
     onAccountSelect,
     onBeneficiarySelect,
+    onCardSelect,
+    onBillSelect,
     onTransferConfirm,
     onTransferEdit,
     onTransferCancel,
+    onCardActionConfirm,
+    onCardActionCancel,
+    onBillPaymentConfirm,
+    onBillPaymentCancel,
+    onRecommendationApply,
+    onRecommendationDetails,
     onSpeechToggle,
     isSpeaking,
     isLoadingSpeech,
@@ -42,10 +71,50 @@ export function ChatMessage({
     const isThisMessageSpeaking = currentSpeakingMessageId === message.id;
     const isThisMessageLoading = isLoadingSpeech && isThisMessageSpeaking;
 
-    // Extract UI data
-    const accounts = message.ui?.showAccounts && message.accounts ? message.accounts : [];
-    const beneficiaries = message.ui?.showBeneficiaries && message.beneficiaries ? message.beneficiaries : [];
-    const transferPreview = message.ui?.transferPreview || message.transferPreview;
+    // Use structured UI data from message
+    const ui = message.ui;
+
+    // Get accounts/beneficiaries based on UI flags
+    const shouldShowAccounts = ui?.showAccounts && message.accounts?.length;
+    const shouldShowBeneficiaries = ui?.showBeneficiaries && message.beneficiaries?.length;
+    const shouldShowCards = ui?.showCards && message.cards?.length;
+    const shouldShowBills = ui?.showBills && message.bills?.length;
+    const shouldShowSpendingBreakdown = ui?.showSpendingBreakdown && message.spendingBreakdown?.length;
+    const shouldShowSubscriptions = ui?.showSubscriptions && message.subscriptions?.length;
+
+    const accounts = shouldShowAccounts ? message.accounts! : [];
+    const beneficiaries = shouldShowBeneficiaries ? message.beneficiaries! : [];
+    // Use message data first, then fall back to props
+    const cards = shouldShowCards ? message.cards! : (ui?.showCards ? fallbackCards : []);
+    const bills = shouldShowBills ? message.bills! : (ui?.showBills ? fallbackBills : []);
+    const spendingBreakdown = shouldShowSpendingBreakdown ? message.spendingBreakdown! : (ui?.showSpendingBreakdown ? fallbackSpendingBreakdown : []);
+    const subscriptions = shouldShowSubscriptions ? message.subscriptions! : (ui?.showSubscriptions ? fallbackSubscriptions : []);
+
+    // Get transfer preview and success from UI or legacy field
+    const transferPreview = ui?.transferPreview || message.transferPreview;
+    const transferSuccess = ui?.transferSuccess;
+
+    // Get card-related UI data
+    const cardPreview = ui?.cardPreview;
+    const cardActionSuccess = ui?.cardActionSuccess;
+
+    // Get spending insights from message or UI (handle both array and object formats)
+    const rawSpendingInsights = message.spendingInsights || ui?.spendingInsights;
+    const spendingInsights = Array.isArray(rawSpendingInsights)
+        ? rawSpendingInsights
+        : (rawSpendingInsights as any)?.insights;
+
+    // Get bill payment UI data
+    const billPaymentPreview = ui?.billPaymentPreview;
+    const billPaymentSuccess = ui?.billPaymentSuccess;
+
+    // Get ticket created data
+    const ticketCreated = ui?.ticketCreated;
+
+    // Get recommendations from message
+    const recommendations = message.recommendations || [];
+    const recommendationsIntro = message.recommendationsIntro;
+    const recommendationsIntroAr = message.recommendationsIntroAr;
 
     const handleSpeechPress = () => {
         if (onSpeechToggle) {
@@ -85,7 +154,7 @@ export function ChatMessage({
                 {isUser ? (
                     <User size={16} color="#fff" />
                 ) : (
-                    <Bot size={16} color="#4F46E5" />
+                    <Bot size={16} color="#4F008D" />
                 )}
             </View>
 
@@ -101,14 +170,37 @@ export function ChatMessage({
                         <SimpleMarkdownRenderer
                             content={message.content}
                             transferPreview={transferPreview || undefined}
+                            transferSuccess={transferSuccess || undefined}
                             accounts={accounts}
                             beneficiaries={beneficiaries}
+                            cards={cards}
+                            cardPreview={cardPreview || undefined}
+                            cardActionSuccess={cardActionSuccess || undefined}
+                            spendingBreakdown={spendingBreakdown}
+                            spendingInsights={spendingInsights || undefined}
+                            subscriptions={subscriptions}
+                            bills={bills}
+                            billPaymentPreview={billPaymentPreview || undefined}
+                            billPaymentSuccess={billPaymentSuccess || undefined}
+                            ticketCreated={ticketCreated || undefined}
+                            recommendations={recommendations}
+                            recommendationsIntro={recommendationsIntro}
+                            recommendationsIntroAr={recommendationsIntroAr}
+                            locale={locale}
+                            onAction={onAction}
                             onAccountSelect={onAccountSelect}
                             onBeneficiarySelect={onBeneficiarySelect}
+                            onCardSelect={onCardSelect}
+                            onBillSelect={onBillSelect}
                             onTransferConfirm={onTransferConfirm}
                             onTransferEdit={onTransferEdit}
                             onTransferCancel={onTransferCancel}
-                            locale={locale}
+                            onCardActionConfirm={onCardActionConfirm}
+                            onCardActionCancel={onCardActionCancel}
+                            onBillPaymentConfirm={onBillPaymentConfirm}
+                            onBillPaymentCancel={onBillPaymentCancel}
+                            onRecommendationApply={onRecommendationApply}
+                            onRecommendationDetails={onRecommendationDetails}
                         />
 
                         {/* Speech toggle button for assistant messages */}
@@ -120,14 +212,14 @@ export function ChatMessage({
                             >
                                 {isThisMessageLoading ? (
                                     <>
-                                        <ActivityIndicator size="small" color="#4F46E5" />
+                                        <ActivityIndicator size="small" color="#4F008D" />
                                         <Text style={[styles.speechButtonText, styles.speechButtonTextActive]}>
                                             {t.loading}
                                         </Text>
                                     </>
                                 ) : isThisMessageSpeaking ? (
                                     <>
-                                        <VolumeX size={14} color="#4F46E5" />
+                                        <VolumeX size={14} color="#4F008D" />
                                         <Text style={[styles.speechButtonText, styles.speechButtonTextActive]}>
                                             {t.stop}
                                         </Text>
@@ -173,7 +265,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     userAvatar: {
-        backgroundColor: '#4F46E5',
+        backgroundColor: '#4F008D',
     },
     botAvatar: {
         backgroundColor: '#EEF2FF',
@@ -187,7 +279,7 @@ const styles = StyleSheet.create({
         flexShrink: 1,
     },
     userBubble: {
-        backgroundColor: '#4F46E5',
+        backgroundColor: '#4F008D',
         padding: 12,
         borderRadius: 16,
         borderTopRightRadius: 2,
@@ -220,13 +312,13 @@ const styles = StyleSheet.create({
         alignSelf: 'flex-end',
     },
     speechButtonActive: {
-        backgroundColor: 'rgba(79, 70, 229, 0.1)',
+        backgroundColor: 'rgba(79, 0, 141, 0.1)',
     },
     speechButtonText: {
         fontSize: 12,
         color: '#6B7280',
     },
     speechButtonTextActive: {
-        color: '#4F46E5',
+        color: '#4F008D',
     },
 });

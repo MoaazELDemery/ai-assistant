@@ -2,6 +2,74 @@
 
 A fully embeddable AI chat interface with voice support (TTS/STT), RTL/Arabic support, and customizable styling.
 
+## Development Workflow
+
+Follow these steps to run the project locally and test the SDK using the included example app.
+
+### 1. Install Dependencies
+
+First, install dependencies for the root SDK project:
+```bash
+npm install
+```
+
+Then, install dependencies for the example application:
+```bash
+cd example
+npm install
+```
+
+### 2. Configure Environment
+
+Before running the app, you need to configure the API keys. Open `src/config/constants.ts` and update the `ENV` object with your credentials:
+
+- **N8N_WEBHOOK_URL**: Your n8n webhook URL for chat.
+- **OPENAI_API_KEY**: Your OpenAI API key.
+- **RESEMBLE_API_TOKEN**: Your Resemble.ai token (if using Resemble for TTS).
+- **Others**: Update provider settings as needed.
+
+### 3. Run the Example App
+
+Navigate to the example directory (if not already there).
+
+**Option 1: Using NPM Scripts (Recommended)**
+
+**Running on Android:**
+```bash
+npm run android
+```
+
+**Running on iOS:**
+```bash
+npm run ios
+```
+
+**Starting the Metro Bundler only:**
+```bash
+npm start
+```
+
+**Option 2: Using Expo CLI Directly**
+
+If you prefer using `npx` directly or need to debug:
+
+```bash
+# Run on Android
+npx expo run:android
+
+# Run on iOS
+npx expo run:ios
+
+# Start Metro Bundler
+npx expo start
+```
+
+> **Note:** If you want to install the Expo CLI globally (optional), you can run:
+> ```bash
+> npm install -g expo-cli
+> ```
+
+
 ## Installation
 
 ```bash

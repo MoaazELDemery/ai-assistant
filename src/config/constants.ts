@@ -6,7 +6,7 @@ export const ENV = {
     // This should point to the web POC server (either ngrok or local network IP)
     // If running web POC locally, use your machine's IP: http://192.168.1.x:3000
     // Or use ngrok: https://your-ngrok-url.ngrok-free.app
-    API_CALLBACK_URL: 'https://a31ee44558e3.ngrok-free.app',
+    API_CALLBACK_URL: 'https://ungravelly-lydia-thornily.ngrok-free.dev',
 
     // OpenAI API Key
     OPENAI_API_KEY: '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',

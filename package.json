@@ -39,17 +39,18 @@
     "@types/react": "~19.1.0",
     "expo": "^54.0.31",
     "expo-module-scripts": "^5.0.8",
+    "lucide-react-native": "^0.562.0",
     "react-native": "0.81.5"
   },
   "peerDependencies": {
+    "@react-native-async-storage/async-storage": "*",
     "expo": "*",
     "expo-av": "*",
     "expo-file-system": "*",
+    "lucide-react-native": "*",
     "react": "*",
     "react-native": "*",
-    "react-native-safe-area-context": "*",
-    "@react-native-async-storage/async-storage": "*",
-    "lucide-react-native": "*"
+    "react-native-safe-area-context": "*"
   },
   "peerDependenciesMeta": {
     "lucide-react-native": {
@@ -57,8 +58,10 @@
     }
   },
   "dependencies": {
-    "expo": "~54.0.31",
-    "react": "19.1.0",
-    "react-native": "0.81.5"
+    "expo": "*",
+    "expo-clipboard": "^8.0.8",
+    "expo-linear-gradient": "^15.0.8",
+    "react": "*",
+    "react-native": "*"
   }
 }

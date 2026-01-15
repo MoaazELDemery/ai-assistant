@@ -64,6 +64,15 @@ export function useChatViewModel(options: UseChatViewModelOptions = {}) {
                 accounts: response.accounts,
                 beneficiaries: response.beneficiaries,
                 transferPreview: response.ui?.transferPreview || response.transferPreview,
+                // Additional data fields
+                cards: response.cards,
+                bills: response.bills,
+                spendingBreakdown: response.spendingBreakdown,
+                subscriptions: response.subscriptions,
+                spendingInsights: response.spendingInsights,
+                recommendations: response.recommendations,
+                recommendationsIntro: response.recommendationsIntro,
+                recommendationsIntroAr: response.recommendationsIntroAr,
             };
 
             setMessages(prev => [...prev, botMsg]);
@@ -88,7 +97,7 @@ export function useChatViewModel(options: UseChatViewModelOptions = {}) {
     }, [sendMessage]);
 
     const handleAccountSelect = useCallback((account: Account) => {
-        sendMessage(`Select account ${account.accountNumber}`);
+        sendMessage(account.name);
     }, [sendMessage]);
 
     // Recording state
@@ -187,10 +196,27 @@ export function useChatViewModel(options: UseChatViewModelOptions = {}) {
         handlers: {
             onAction: handleAction,
             onAccountSelect: handleAccountSelect,
-            onBeneficiarySelect: (b: any) => sendMessage(b.name),
-            onTransferConfirm: () => sendMessage("Confirm transfer"),
-            onTransferEdit: () => sendMessage("Edit transfer"),
-            onTransferCancel: () => sendMessage("Cancel transfer"),
+            onBeneficiarySelect: (b: any) => sendMessage(`${b.name}`),
+            onTransferConfirm: () => sendMessage("Confirm the transfer"),
+            onTransferEdit: () => sendMessage("I want to edit the transfer details"),
+            onTransferCancel: () => sendMessage("Cancel the transfer"),
+            // Card handlers
+            onCardSelect: (card: any) => sendMessage(`Manage my ${card.name}`),
+            onCardActionConfirm: () => sendMessage("Confirm the card action"),
+            onCardActionCancel: () => sendMessage("Cancel the card action"),
+            // Bill handlers
+            onBillSelect: (bill: any) => sendMessage(`Pay my ${bill.providerName} bill`),
+            onBillPaymentConfirm: () => sendMessage("Confirm the bill payment"),
+            onBillPaymentCancel: () => sendMessage("Cancel the bill payment"),
+            // Recommendation handlers
+            onRecommendationApply: (rec: any) => {
+                const title = locale === 'ar' ? rec.titleAr : rec.title;
+                sendMessage(`I want to apply for ${title}`);
+            },
+            onRecommendationDetails: (rec: any) => {
+                const title = locale === 'ar' ? rec.titleAr : rec.title;
+                sendMessage(`Tell me more about ${title}`);
+            },
         }
     };
 }

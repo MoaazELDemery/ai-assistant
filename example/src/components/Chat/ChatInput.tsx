@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
         opacity: 0.5,
     },
     sendButton: {
-        backgroundColor: '#4F46E5',
+        backgroundColor: '#4F008D',
     },
     micButton: {
         backgroundColor: '#E5E7EB',

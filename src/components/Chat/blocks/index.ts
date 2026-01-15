@@ -1,4 +1,16 @@
 export { AccountListBlock } from './AccountListBlock';
 export { TransferPreviewBlock } from './TransferPreviewBlock';
 export { BeneficiaryListBlock } from './BeneficiaryListBlock';
-// Add others as they are implemented
+export { CardListBlock } from './CardListBlock';
+export { CardPreviewBlock } from './CardPreviewBlock';
+export { CardActionSuccessBlock } from './CardActionSuccessBlock';
+export { SpendingBreakdownBlock } from './SpendingBreakdownBlock';
+export { SpendingInsightsBlock } from './SpendingInsightsBlock';
+export { SubscriptionListBlock } from './SubscriptionListBlock';
+export { BillListBlock } from './BillListBlock';
+export { BillPaymentPreviewBlock } from './BillPaymentPreviewBlock';
+export { BillPaymentSuccessBlock } from './BillPaymentSuccessBlock';
+export { TicketCreatedBlock } from './TicketCreatedBlock';
+export { TransferSuccessBlock } from './TransferSuccessBlock';
+export { RecommendationsBlock } from './RecommendationsBlock';
+export type { Recommendation } from './RecommendationsBlock';

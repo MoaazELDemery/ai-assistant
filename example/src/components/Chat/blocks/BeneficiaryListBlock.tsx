@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     avatarText: {
         fontSize: 20,
         fontWeight: '600',
-        color: '#4F46E5', // Indigo 600
+        color: '#4F008D', // Indigo 600 -> Purple
     },
     textContainer: {
         alignItems: 'center',

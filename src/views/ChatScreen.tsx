@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useCallback } from 'react';
 import { View, StyleSheet, FlatList, KeyboardAvoidingView, Platform, Text, TouchableOpacity, I18nManager } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Volume2, VolumeX, Globe } from 'lucide-react-native';
+import { Volume2, VolumeX, Globe, Sparkles } from 'lucide-react-native';
 import { ChatMessage } from '../components/Chat/ChatMessage';
 import { ChatInput } from '../components/Chat/ChatInput';
 import { TypingIndicator } from '../components/Chat/TypingIndicator';
@@ -109,11 +109,14 @@ export function ChatScreen() {
                     style={[styles.headerButton, isRTL && styles.headerButtonRTL]}
                     onPress={toggleLanguage}
                 >
-                    <Globe size={20} color="#4F46E5" />
+                    <Globe size={20} color="#4F008D" />
                     <Text style={styles.languageText}>{locale === 'en' ? 'AR' : 'EN'}</Text>
                 </TouchableOpacity>
 
-                <Text style={dynamicStyles.headerTitle}>{t('chat.title')}</Text>
+                <View style={styles.titleContainer}>
+                    <Text style={dynamicStyles.headerTitle}>{t('chat.title')}</Text>
+                    <Sparkles size={16} color="#4F008D" style={styles.titleIcon} />
+                </View>
 
                 {/* Auto-speak toggle - right side */}
                 <TouchableOpacity
@@ -121,7 +124,7 @@ export function ChatScreen() {
                     onPress={toggleAutoSpeak}
                 >
                     {autoSpeak ? (
-                        <Volume2 size={20} color="#4F46E5" />
+                        <Volume2 size={20} color="#4F008D" />
                     ) : (
                         <VolumeX size={20} color="#9CA3AF" />
                     )}
@@ -212,12 +215,20 @@ const styles = StyleSheet.create({
     autoSpeakButton: {
     },
     autoSpeakButtonActive: {
-        backgroundColor: 'rgba(79, 70, 229, 0.1)',
+        backgroundColor: 'rgba(79, 0, 141, 0.1)',
     },
     languageText: {
         fontSize: 12,
         fontWeight: '600',
-        color: '#4F46E5',
+        color: '#4F008D',
+    },
+    titleContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+    },
+    titleIcon: {
+        marginTop: 2,
     },
     keyboardView: {
         flex: 1,
