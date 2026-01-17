@@ -1,8 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Card } from '../../ui/Card';
 import { Beneficiary } from '../../../types';
-// import Animated, { FadeInRight } from 'react-native-reanimated';
 
 interface BeneficiaryListBlockProps {
     beneficiaries: Beneficiary[];

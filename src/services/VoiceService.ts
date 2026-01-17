@@ -1,5 +1,5 @@
-import * as FileSystem from 'expo-file-system/legacy';
 import { ENV } from '../config/constants';
+import * as FileSystem from 'expo-file-system/legacy';
 
 export class VoiceService {
     static async textToSpeech(text: string, locale: string = 'en'): Promise<string> {
@@ -8,7 +8,8 @@ export class VoiceService {
                 try {
                     return await this.generateWithResemble(text, locale);
                 } catch (resembleError) {
-                    console.warn('TTS fallback to OpenAI');
+                    // Fallback to OpenAI if Resemble fails (rate limits, etc.)
+                    console.warn('TTS fallback to OpenAI', resembleError);
                     return await this.generateWithOpenAI(text, locale);
                 }
             } else {

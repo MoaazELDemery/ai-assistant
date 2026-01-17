@@ -4,7 +4,6 @@ import { Eye, EyeOff } from 'lucide-react-native';
 import { Card } from '../../ui/Card';
 import { Account } from '../../../types';
 import { formatCurrency } from '../../../lib/utils';
-// import Animated, { FadeInRight } from 'react-native-reanimated';
 
 interface AccountListBlockProps {
     accounts: Account[];

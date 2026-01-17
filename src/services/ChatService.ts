@@ -1,4 +1,4 @@
-import { Account, Beneficiary, Card, Bill, SpendingBreakdown, Subscription, SpendingInsight } from '../types';
+import { SpendingBreakdown } from '../types';
 import { ENV } from '../config/constants';
 
 import { mockAccounts } from '../data/accounts';
@@ -7,92 +7,9 @@ import { mockCards } from '../data/cards';
 import { mockBills } from '../data/bills';
 import { mockSpendingBreakdown, generateRandomSpendingBreakdown } from '../data/spending';
 import { mockSubscriptions } from '../data/subscriptions';
-import { getRandomRecommendations, getContextualRecommendations } from '../data/products';
+import { getContextualRecommendations } from '../data/products';
 
 const N8N_WEBHOOK_URL = ENV.N8N_WEBHOOK_URL;
-
-
-
-// Functions removed as they are handled by N8N backend now
-
-// Mock spending insights
-const mockSpendingInsights: SpendingInsight[] = [
-    {
-        type: 'comparison',
-        message: 'Your dining spending is 25% higher than last month',
-        messageAr: 'إنفاقك على المطاعم أعلى بنسبة 25% من الشهر الماضي',
-        category: 'dining',
-        changePercent: 25,
-    },
-    {
-        type: 'unusual',
-        message: 'Unusual activity detected: Large purchase at Electronics Store',
-        messageAr: 'نشاط غير عادي: عملية شراء كبيرة في متجر الإلكترونيات',
-        amount: 2500,
-    },
-    {
-        type: 'subscription',
-        message: 'You have 3 subscriptions renewing this week',
-        messageAr: 'لديك 3 اشتراكات تجدد هذا الأسبوع',
-    },
-    {
-        type: 'trend',
-        message: 'Your overall spending is down 10% compared to last month',
-        messageAr: 'إجمالي إنفاقك انخفض بنسبة 10% مقارنة بالشهر الماضي',
-        changePercent: -10,
-    },
-];
-
-// Mock recommendations for personalized offers
-const mockRecommendations = [
-    {
-        id: 'rec-1',
-        title: 'Salary-Linked Savings',
-        titleAr: 'ادخار مرتبط بالراتب',
-        description: 'You have a healthy balance but a low monthly savings rate (4%). This automates your savings.',
-        descriptionAr: 'لديك رصيد جيد ولكن معدل ادخار شهري منخفض (4%). هذا يؤتمت مدخراتك.',
-        ctaQuestion: 'Would you like to start saving?',
-        ctaQuestionAr: 'هل تود البدء في الادخار؟',
-        features: ['Save before you spend', 'Salary must be transferred to STC Bank account'],
-        featuresAr: ['ادخر قبل أن تنفق', 'يجب تحويل الراتب إلى حساب stc bank'],
-        badges: [
-            { text: 'Special Offer', textAr: 'عرض خاص', variant: 'special' as const },
-            { text: 'Savings', textAr: 'ادخار', variant: 'category' as const }
-        ],
-        icon: 'savings' as const,
-    },
-    {
-        id: 'rec-2',
-        title: 'Automatic Savings Plan',
-        titleAr: 'خطة ادخار تلقائية',
-        description: 'Helps you set aside a fixed amount monthly to manage your increased dining spending.',
-        descriptionAr: 'تساعدك على تخصيص مبلغ ثابت شهريًا لإدارة إنفاقك المتزايد على المطاعم.',
-        ctaQuestion: 'Want to set this up?',
-        ctaQuestionAr: 'هل تريد إعداد هذا؟',
-        features: ['Automatic monthly transfers', 'Available for all account holders'],
-        featuresAr: ['تحويلات شهرية تلقائية', 'متاح لجميع أصحاب الحسابات'],
-        badges: [
-            { text: 'Savings', textAr: 'ادخار', variant: 'category' as const }
-        ],
-        icon: 'piggybank' as const,
-    },
-    {
-        id: 'rec-3',
-        title: 'Goal-Based Savings',
-        titleAr: 'ادخار قائم على الأهداف',
-        description: "Perfect if you're saving for something specific like a vacation or big purchase.",
-        descriptionAr: 'مثالي إذا كنت تدخر لشيء محدد مثل إجازة أو عملية شراء كبيرة.',
-        ctaQuestion: 'Do you have a savings goal?',
-        ctaQuestionAr: 'هل لديك هدف ادخاري؟',
-        features: ['Track progress towards your goal', 'Set your goal and we will help you achieve it'],
-        featuresAr: ['تتبع التقدم نحو هدفك', 'حدد هدفك وسنساعدك على تحقيقه'],
-        badges: [
-            { text: 'Savings', textAr: 'ادخار', variant: 'category' as const }
-        ],
-        icon: 'target' as const,
-    },
-];
-
 // Generate mock response for common queries (matching web app behavior)
 function getMockResponse(message: string, sessionId: string, locale: string): any | null {
     const lowerMessage = message.toLowerCase();

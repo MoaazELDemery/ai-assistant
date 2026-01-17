@@ -48,7 +48,6 @@
     "expo-av": "*",
     "expo-file-system": "*",
     "lucide-react-native": "*",
-    "react": "*",
     "react-native": "*",
     "react-native-safe-area-context": "*"
   },
@@ -58,10 +57,17 @@
     }
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "*",
     "expo": "*",
+    "expo-av": "*",
     "expo-clipboard": "^8.0.8",
+    "expo-file-system": "*",
     "expo-linear-gradient": "^15.0.8",
-    "react": "*",
-    "react-native": "*"
+    "expo-updates": "~29.0.16",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-native": "*",
+    "react-native-markdown-display": "^7.0.2",
+    "react-native-safe-area-context": "*"
   }
 }

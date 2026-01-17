@@ -3,8 +3,16 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
-      "ai-assistant": ["../src/index"],
-      "ai-assistant/*": ["../src/*"]
+      "ai-assistant": [
+        "../src/index"
+      ],
+      "ai-assistant/*": [
+        "../src/*"
+      ]
     }
-  }
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+  ]
 }

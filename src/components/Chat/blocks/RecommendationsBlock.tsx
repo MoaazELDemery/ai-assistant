@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { Sparkles, PiggyBank, Target, TrendingUp, CreditCard, CheckCircle2 } from 'lucide-react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { PiggyBank, Target, TrendingUp, CreditCard, CheckCircle2 } from 'lucide-react-native';
 import { Card } from '../../ui/Card';
 
 export interface Recommendation {

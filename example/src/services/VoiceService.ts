@@ -9,7 +9,7 @@ export class VoiceService {
                     return await this.generateWithResemble(text, locale);
                 } catch (resembleError) {
                     // Fallback to OpenAI if Resemble fails (rate limits, etc.)
-                    console.warn('TTS fallback to OpenAI');
+                    console.warn('TTS fallback to OpenAI', resembleError);
                     return await this.generateWithOpenAI(text, locale);
                 }
             } else {

@@ -84,6 +84,11 @@ export const ENV = {
   API_CALLBACK_URL: 'https://your-api.com',
   NGROK_URL: 'https://ungravelly-lydia-thornily.ngrok-free.dev',
 
+  // NGROK_URL Locations:
+  example\.env
+  example\src\config\constants.ts
+  src\config\constants.ts
+  
   // OpenAI
   OPENAI_API_KEY: 'sk-xxxxxxxx',
 

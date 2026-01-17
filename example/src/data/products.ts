@@ -1,6 +1,4 @@
-
-import { Recommendation } from '../types';
-
+import { Recommendation } from '../types'
 // Product recommendations database
 export const products: Recommendation[] = [
     {

@@ -9,7 +9,6 @@ interface UseChatViewModelOptions {
     locale?: Locale;
 }
 
-// Helper to get welcome message based on locale
 function getWelcomeMessage(locale: Locale): ChatMessage {
     const content = locale === 'ar'
         ? "مرحباً! أنا مساعد بنك STC الذكي. يمكنني مساعدتك في:\n\n- عرض أرصدة الحسابات\n- إجراء التحويلات\n- إدارة المستفيدين\n- التحقق من أسعار الصرف\n\nكيف يمكنني مساعدتك اليوم؟"

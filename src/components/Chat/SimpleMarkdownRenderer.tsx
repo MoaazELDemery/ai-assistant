@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, StyleSheet, Text } from 'react-native';
-import Markdown, { RenderRules } from 'react-native-markdown-display';
+import { View, StyleSheet } from 'react-native';
+import Markdown from 'react-native-markdown-display';
 import {
     TransferPreviewBlock,
     AccountListBlock,
@@ -164,148 +164,150 @@ export function SimpleMarkdownRenderer({
             ) : null}
 
             {/* Blocks */}
-            <View style={styles.blocksContainer}>
-                {/* Render transfer preview if present */}
-                {hasTransferPreview && transferPreview && (
-                    <TransferPreviewBlock
-                        block={{
-                            id: 'transfer-preview',
-                            type: 'transfer',
-                            preview: transferPreview,
-                            rawContent: '',
-                        }}
-                        locale={locale}
-                        onConfirm={onTransferConfirm}
-                        onEdit={onTransferEdit}
-                        onCancel={onTransferCancel}
-                    />
-                )}
+            {(hasTransferPreview || hasTransferSuccess || hasAccounts || hasBeneficiaries || hasCards || hasCardPreview || hasCardActionSuccess || hasSpendingBreakdown || hasSpendingInsights || hasSubscriptions || hasBills || hasBillPaymentPreview || hasBillPaymentSuccess || hasTicketCreated || hasRecommendations) && (
+                <View style={styles.blocksContainer}>
+                    {/* Render transfer preview if present */}
+                    {hasTransferPreview && transferPreview && (
+                        <TransferPreviewBlock
+                            block={{
+                                id: 'transfer-preview',
+                                type: 'transfer',
+                                preview: transferPreview,
+                                rawContent: '',
+                            }}
+                            locale={locale}
+                            onConfirm={onTransferConfirm}
+                            onEdit={onTransferEdit}
+                            onCancel={onTransferCancel}
+                        />
+                    )}
 
-                {/* Render transfer success if present */}
-                {hasTransferSuccess && (
-                    <TransferSuccessBlock
-                        success={transferSuccess!}
-                        locale={locale}
-                    />
-                )}
+                    {/* Render transfer success if present */}
+                    {hasTransferSuccess && (
+                        <TransferSuccessBlock
+                            success={transferSuccess!}
+                            locale={locale}
+                        />
+                    )}
 
-                {/* Render accounts if present */}
-                {hasAccounts && (
-                    <AccountListBlock
-                        accounts={accounts}
-                        locale={locale}
-                        onSelect={onAccountSelect}
-                    />
-                )}
+                    {/* Render accounts if present */}
+                    {hasAccounts && (
+                        <AccountListBlock
+                            accounts={accounts}
+                            locale={locale}
+                            onSelect={onAccountSelect}
+                        />
+                    )}
 
-                {/* Render beneficiaries if present */}
-                {hasBeneficiaries && (
-                    <BeneficiaryListBlock
-                        beneficiaries={beneficiaries}
-                        locale={locale}
-                        onSelect={onBeneficiarySelect}
-                    />
-                )}
+                    {/* Render beneficiaries if present */}
+                    {hasBeneficiaries && (
+                        <BeneficiaryListBlock
+                            beneficiaries={beneficiaries}
+                            locale={locale}
+                            onSelect={onBeneficiarySelect}
+                        />
+                    )}
 
-                {/* Render cards if present */}
-                {hasCards && (
-                    <CardListBlock
-                        cards={cards}
-                        locale={locale}
-                        onSelect={onCardSelect}
-                    />
-                )}
+                    {/* Render cards if present */}
+                    {hasCards && (
+                        <CardListBlock
+                            cards={cards}
+                            locale={locale}
+                            onSelect={onCardSelect}
+                        />
+                    )}
 
-                {/* Render card preview if present */}
-                {hasCardPreview && cardPreview && (
-                    <CardPreviewBlock
-                        cardPreview={cardPreview}
-                        locale={locale}
-                        onConfirm={onCardActionConfirm}
-                        onCancel={onCardActionCancel}
-                    />
-                )}
+                    {/* Render card preview if present */}
+                    {hasCardPreview && cardPreview && (
+                        <CardPreviewBlock
+                            cardPreview={cardPreview}
+                            locale={locale}
+                            onConfirm={onCardActionConfirm}
+                            onCancel={onCardActionCancel}
+                        />
+                    )}
 
-                {/* Render card action success if present */}
-                {hasCardActionSuccess && cardActionSuccess && (
-                    <CardActionSuccessBlock
-                        success={cardActionSuccess}
-                        locale={locale}
-                    />
-                )}
+                    {/* Render card action success if present */}
+                    {hasCardActionSuccess && cardActionSuccess && (
+                        <CardActionSuccessBlock
+                            success={cardActionSuccess}
+                            locale={locale}
+                        />
+                    )}
 
-                {/* Render spending breakdown if present */}
-                {hasSpendingBreakdown && (
-                    <SpendingBreakdownBlock
-                        breakdown={spendingBreakdown}
-                        total={spendingBreakdown.reduce((sum, item) => sum + item.amount, 0)}
-                        locale={locale}
-                    />
-                )}
+                    {/* Render spending breakdown if present */}
+                    {hasSpendingBreakdown && (
+                        <SpendingBreakdownBlock
+                            breakdown={spendingBreakdown}
+                            total={spendingBreakdown.reduce((sum, item) => sum + item.amount, 0)}
+                            locale={locale}
+                        />
+                    )}
 
-                {/* Render spending insights if present */}
-                {hasSpendingInsights && (
-                    <SpendingInsightsBlock
-                        insights={spendingInsights}
-                        locale={locale}
-                    />
-                )}
+                    {/* Render spending insights if present */}
+                    {hasSpendingInsights && (
+                        <SpendingInsightsBlock
+                            insights={spendingInsights}
+                            locale={locale}
+                        />
+                    )}
 
-                {/* Render subscriptions if present */}
-                {hasSubscriptions && (
-                    <SubscriptionListBlock
-                        subscriptions={subscriptions}
-                        locale={locale}
-                    />
-                )}
+                    {/* Render subscriptions if present */}
+                    {hasSubscriptions && (
+                        <SubscriptionListBlock
+                            subscriptions={subscriptions}
+                            locale={locale}
+                        />
+                    )}
 
-                {/* Render bills if present */}
-                {hasBills && (
-                    <BillListBlock
-                        bills={bills}
-                        locale={locale}
-                        onSelect={onBillSelect}
-                    />
-                )}
+                    {/* Render bills if present */}
+                    {hasBills && (
+                        <BillListBlock
+                            bills={bills}
+                            locale={locale}
+                            onSelect={onBillSelect}
+                        />
+                    )}
 
-                {/* Render bill payment preview if present */}
-                {hasBillPaymentPreview && billPaymentPreview && (
-                    <BillPaymentPreviewBlock
-                        preview={billPaymentPreview}
-                        locale={locale}
-                        onConfirm={onBillPaymentConfirm}
-                        onCancel={onBillPaymentCancel}
-                    />
-                )}
+                    {/* Render bill payment preview if present */}
+                    {hasBillPaymentPreview && billPaymentPreview && (
+                        <BillPaymentPreviewBlock
+                            preview={billPaymentPreview}
+                            locale={locale}
+                            onConfirm={onBillPaymentConfirm}
+                            onCancel={onBillPaymentCancel}
+                        />
+                    )}
 
-                {/* Render bill payment success if present */}
-                {hasBillPaymentSuccess && billPaymentSuccess && (
-                    <BillPaymentSuccessBlock
-                        success={billPaymentSuccess}
-                        locale={locale}
-                    />
-                )}
+                    {/* Render bill payment success if present */}
+                    {hasBillPaymentSuccess && billPaymentSuccess && (
+                        <BillPaymentSuccessBlock
+                            success={billPaymentSuccess}
+                            locale={locale}
+                        />
+                    )}
 
-                {/* Render ticket created if present */}
-                {hasTicketCreated && ticketCreated && (
-                    <TicketCreatedBlock
-                        ticket={ticketCreated}
-                        locale={locale}
-                    />
-                )}
+                    {/* Render ticket created if present */}
+                    {hasTicketCreated && ticketCreated && (
+                        <TicketCreatedBlock
+                            ticket={ticketCreated}
+                            locale={locale}
+                        />
+                    )}
 
-                {/* Render recommendations if present */}
-                {hasRecommendations && (
-                    <RecommendationsBlock
-                        recommendations={recommendations}
-                        introMessage={recommendationsIntro}
-                        introMessageAr={recommendationsIntroAr}
-                        locale={locale}
-                        onApply={onRecommendationApply}
-                        onDetails={onRecommendationDetails}
-                    />
-                )}
-            </View>
+                    {/* Render recommendations if present */}
+                    {hasRecommendations && (
+                        <RecommendationsBlock
+                            recommendations={recommendations}
+                            introMessage={recommendationsIntro}
+                            introMessageAr={recommendationsIntroAr}
+                            locale={locale}
+                            onApply={onRecommendationApply}
+                            onDetails={onRecommendationDetails}
+                        />
+                    )}
+                </View>
+            )}
         </View>
     );
 }

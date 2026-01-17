@@ -4,7 +4,6 @@ import { Wallet, Building2, ArrowRight } from 'lucide-react-native';
 import { Card } from '../../ui/Card';
 import { formatCurrency } from '../../../lib/utils';
 import { TransferPreview } from '../../../types';
-// import Animated, { FadeInUp } from 'react-native-reanimated';
 
 interface TransferBlockData {
     id: string;
