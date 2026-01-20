@@ -4,10 +4,14 @@ import { ChatService } from '../services/ChatService';
 import { VoiceService } from '../services/VoiceService';
 import { Audio } from 'expo-av';
 import { Locale } from '../contexts/LocaleContext';
+import { AppResetManager, CleanupPriority } from '../services/AppResetManager';
 
 interface UseChatViewModelOptions {
     locale?: Locale;
 }
+
+// Instance counter for unique IDs
+let instanceCounter = 0;
 
 function getWelcomeMessage(locale: Locale): ChatMessage {
     const content = locale === 'ar'
@@ -30,17 +34,97 @@ export function useChatViewModel(options: UseChatViewModelOptions = {}) {
     const [isTranscribing, setIsTranscribing] = useState(false);
     const [sessionId, setSessionId] = useState(() => `session-${Date.now()}`);
     const prevLocaleRef = useRef(locale);
+    const instanceIdRef = useRef(`chat-${++instanceCounter}`);
+    const isDisposedRef = useRef(false);
+
+    // Recording state
+    const recordingRef = useRef<Audio.Recording | null>(null);
+    const [isRecording, setIsRecording] = useState(false);
+    const isStartingRef = useRef(false);
+
+    /**
+     * Dispose all recording resources
+     */
+    const disposeRecording = useCallback(async () => {
+        console.log(`[useChatViewModel:${instanceIdRef.current}] Disposing recording resources...`);
+
+        if (recordingRef.current) {
+            try {
+                await recordingRef.current.stopAndUnloadAsync().catch(() => { });
+            } catch (error) {
+                console.warn('Error disposing recording:', error);
+            } finally {
+                recordingRef.current = null;
+            }
+        }
+
+        setIsRecording(false);
+        isStartingRef.current = false;
+
+        console.log(`[useChatViewModel:${instanceIdRef.current}] Recording resources disposed`);
+    }, []);
+
+    /**
+     * Full cleanup for this view model
+     */
+    const cleanup = useCallback(async () => {
+        console.log(`[useChatViewModel:${instanceIdRef.current}] Full cleanup...`);
+
+        isDisposedRef.current = true;
+        await disposeRecording();
+
+        // Reset all state
+        setMessages([]);
+        setIsLoading(false);
+        setIsTranscribing(false);
+
+        console.log(`[useChatViewModel:${instanceIdRef.current}] Cleanup complete`);
+    }, [disposeRecording]);
+
+    // Register cleanup with AppResetManager
+    useEffect(() => {
+        const cleanupId = `chat-recording-${instanceIdRef.current}`;
+
+        const unregister = AppResetManager.registerCleanup(
+            cleanupId,
+            cleanup,
+            CleanupPriority.RECORDING
+        );
+
+        // Reset disposed state on mount
+        isDisposedRef.current = false;
+
+        return () => {
+            unregister();
+            cleanup();
+        };
+    }, [cleanup]);
 
     // Reset chat when locale changes
     useEffect(() => {
         if (prevLocaleRef.current !== locale) {
+            console.log(`[useChatViewModel:${instanceIdRef.current}] Locale changed, resetting chat`);
             prevLocaleRef.current = locale;
+
+            // Stop any ongoing recording first
+            disposeRecording();
+
+            // Reset messages with new welcome message
             setMessages([getWelcomeMessage(locale)]);
             setSessionId(`session-${Date.now()}`);
+
+            // Reset disposed flag for new locale
+            isDisposedRef.current = false;
         }
-    }, [locale]);
+    }, [locale, disposeRecording]);
 
     const sendMessage = useCallback(async (content: string) => {
+        // Don't send if disposed
+        if (isDisposedRef.current) {
+            console.log(`[useChatViewModel:${instanceIdRef.current}] Cannot send - instance disposed`);
+            return;
+        }
+
         const userMsg: ChatMessage = {
             id: Date.now().toString(),
             role: 'user',
@@ -53,6 +137,12 @@ export function useChatViewModel(options: UseChatViewModelOptions = {}) {
 
         try {
             const response = await ChatService.sendMessage(content, sessionId, locale);
+
+            // Check if disposed while waiting for response
+            if (isDisposedRef.current) {
+                console.log(`[useChatViewModel:${instanceIdRef.current}] Response received but instance disposed`);
+                return;
+            }
 
             const botMsg: ChatMessage = {
                 id: (Date.now() + 1).toString(),
@@ -77,16 +167,21 @@ export function useChatViewModel(options: UseChatViewModelOptions = {}) {
             setMessages(prev => [...prev, botMsg]);
         } catch (error) {
             console.error('Chat error:', error);
-            setMessages(prev => [...prev, {
-                id: Date.now().toString(),
-                role: 'assistant',
-                content: locale === 'ar'
-                    ? "عذراً، أواجه مشكلة في الاتصال حالياً. يرجى المحاولة مرة أخرى لاحقاً."
-                    : "Sorry, I'm having trouble connecting right now. Please try again later.",
-                timestamp: new Date().toISOString(),
-            }]);
+
+            if (!isDisposedRef.current) {
+                setMessages(prev => [...prev, {
+                    id: Date.now().toString(),
+                    role: 'assistant',
+                    content: locale === 'ar'
+                        ? "عذراً، أواجه مشكلة في الاتصال حالياً. يرجى المحاولة مرة أخرى لاحقاً."
+                        : "Sorry, I'm having trouble connecting right now. Please try again later.",
+                    timestamp: new Date().toISOString(),
+                }]);
+            }
         } finally {
-            setIsLoading(false);
+            if (!isDisposedRef.current) {
+                setIsLoading(false);
+            }
         }
     }, [sessionId, locale]);
 
@@ -99,12 +194,12 @@ export function useChatViewModel(options: UseChatViewModelOptions = {}) {
         sendMessage(account.name);
     }, [sendMessage]);
 
-    // Recording state
-    const recordingRef = useRef<Audio.Recording | null>(null);
-    const [isRecording, setIsRecording] = useState(false);
-    const isStartingRef = useRef(false);
-
     const startRecording = useCallback(async () => {
+        if (isDisposedRef.current) {
+            console.log(`[useChatViewModel:${instanceIdRef.current}] Cannot start recording - instance disposed`);
+            return;
+        }
+
         if (isStartingRef.current || recordingRef.current) return;
         isStartingRef.current = true;
 
@@ -123,6 +218,12 @@ export function useChatViewModel(options: UseChatViewModelOptions = {}) {
             const { recording } = await Audio.Recording.createAsync(
                 Audio.RecordingOptionsPresets.HIGH_QUALITY
             );
+
+            // Check if disposed while setting up
+            if (isDisposedRef.current) {
+                await recording.stopAndUnloadAsync().catch(() => { });
+                return;
+            }
 
             recordingRef.current = recording;
             setIsRecording(true);
@@ -146,7 +247,7 @@ export function useChatViewModel(options: UseChatViewModelOptions = {}) {
 
             const uri = recording.getURI();
 
-            if (uri) {
+            if (uri && !isDisposedRef.current) {
                 // Small delay to ensure file is fully written
                 await new Promise(resolve => setTimeout(resolve, 100));
 
@@ -168,13 +269,15 @@ export function useChatViewModel(options: UseChatViewModelOptions = {}) {
                         }
                     }
 
-                    if (text) {
+                    if (text && !isDisposedRef.current) {
                         await sendMessage(text);
                     }
                 } catch (error) {
                     console.error('Voice processing error:', error);
                 } finally {
-                    setIsTranscribing(false);
+                    if (!isDisposedRef.current) {
+                        setIsTranscribing(false);
+                    }
                 }
             }
         } catch (error) {

@@ -1,46 +1,58 @@
 {
   "expo": {
-    "name": "ai-assistant-example",
-    "slug": "ai-assistant-example",
+    "name": "AI Assistant",
+    "slug": "ai-assistant",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
+    "scheme": "aiassistant",
+    "userInterfaceStyle": "automatic",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
+      "bundleIdentifier": "com.Demery.AIAssistant",
       "supportsTablet": true,
-      "bundleIdentifier": "expo.modules.aiassistant.example",
       "infoPlist": {
-        "NSMicrophoneUsageDescription": "Allow access to microphone for voice commands."
+        "NSMicrophoneUsageDescription": "This app requires microphone access for voice commands and speech recognition.",
+        "NSSpeechRecognitionUsageDescription": "This app uses speech recognition for voice commands.",
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true,
+          "NSAllowsLocalNetworking": true,
+          "NSExceptionDomains": {
+            "ngrok-free.dev": {
+              "NSExceptionAllowsInsecureHTTPLoads": true,
+              "NSIncludesSubdomains": true
+            },
+            "ngrok.io": {
+              "NSExceptionAllowsInsecureHTTPLoads": true,
+              "NSIncludesSubdomains": true
+            },
+            "localhost": {
+              "NSExceptionAllowsInsecureHTTPLoads": true
+            },
+            "159.89.8.87": {
+              "NSExceptionAllowsInsecureHTTPLoads": true,
+              "NSTemporaryExceptionMinimumTLSVersion": "TLSv1.0",
+              "NSTemporaryExceptionRequiresForwardSecrecy": false
+            }
+          }
+        }
       }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false,
-      "package": "expo.modules.aiassistant.example",
-      "permissions": [
-        "RECORD_AUDIO"
-      ]
+      "package": "com.demery.aiassistant",
+      "usesCleartextTraffic": true
     },
     "plugins": [
       [
-        "expo-audio",
+        "expo-av",
         {
-          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone."
+          "microphonePermission": "Allow AI Assistant to access your microphone for voice commands."
         }
       ]
-    ],
-    "web": {
-      "favicon": "./assets/favicon.png"
-    }
+    ]
   }
 }

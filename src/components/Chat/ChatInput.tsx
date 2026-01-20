@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, I18nManager } from 'react-native';
 import { Send, Mic } from 'lucide-react-native';
 import { Locale } from '../../contexts/LocaleContext';
 
@@ -26,6 +26,9 @@ export function ChatInput({
 }: ChatInputProps) {
     const [text, setText] = useState('');
 
+    // Determine effective layout direction (XOR logic)
+    const isLayoutRTL = isRTL ? !I18nManager.isRTL : I18nManager.isRTL;
+
     // Disable input when loading response or transcribing voice
     const isDisabled = isLoading || isTranscribing;
 
@@ -45,7 +48,7 @@ export function ChatInput({
             <View style={[
                 styles.inputContainer,
                 isDisabled && styles.inputContainerDisabled,
-                isRTL && styles.inputContainerRTL,
+                isLayoutRTL && styles.inputContainerRTL,
             ]}>
                 <TextInput
                     style={[

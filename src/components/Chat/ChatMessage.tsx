@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, ActivityIndicator, I18nManager } from 'react-native';
 import { Bot, User, Volume2, VolumeX } from 'lucide-react-native';
 import { ChatMessage as ChatMessageType, Account, Beneficiary, Card, Bill, SpendingBreakdown, Subscription, Recommendation } from '../../types';
 import { SimpleMarkdownRenderer } from './SimpleMarkdownRenderer';
@@ -129,22 +129,28 @@ export function ChatMessage({
         loading: locale === 'ar' ? 'جاري التحميل...' : 'Loading...',
     };
 
+    // Determine effective layout direction (XOR logic)
+    // If language is RTL but engine is LTR -> Use RTL Styles
+    // If language is LTR but engine is RTL -> Use RTL Styles (to force LTR visual in RTL engine)
+    // If language matches engine -> Use Normal Styles
+    const isLayoutRTL = isRTL ? !I18nManager.isRTL : I18nManager.isRTL;
+
     // Dynamic styles based on RTL and user/bot
     const containerStyle = [
         styles.container,
         isUser
-            ? (isRTL ? styles.userContainerRTL : styles.userContainer)
-            : (isRTL ? styles.botContainerRTL : styles.botContainer)
+            ? (isLayoutRTL ? styles.userContainerRTL : styles.userContainer)
+            : (isLayoutRTL ? styles.botContainerRTL : styles.botContainer)
     ];
 
     const userBubbleStyle = [
         styles.userBubble,
-        isRTL ? styles.userBubbleRTL : null,
+        isLayoutRTL ? styles.userBubbleRTL : null,
     ];
 
     const speechButtonStyle = [
         styles.speechButton,
-        isRTL && styles.speechButtonRTL,
+        isLayoutRTL && styles.speechButtonRTL,
         (isThisMessageSpeaking || isThisMessageLoading) && styles.speechButtonActive,
     ];
 
@@ -201,6 +207,8 @@ export function ChatMessage({
                             onBillPaymentCancel={onBillPaymentCancel}
                             onRecommendationApply={onRecommendationApply}
                             onRecommendationDetails={onRecommendationDetails}
+                            isRTL={isRTL}
+                            isLayoutRTL={isLayoutRTL}
                         />
 
                         {/* Speech toggle button for assistant messages */}

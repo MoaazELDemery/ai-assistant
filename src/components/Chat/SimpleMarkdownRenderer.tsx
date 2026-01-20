@@ -80,6 +80,8 @@ interface SimpleMarkdownRendererProps {
     onBillPaymentCancel?: () => void;
     onRecommendationApply?: (recommendation: Recommendation) => void;
     onRecommendationDetails?: (recommendation: Recommendation) => void;
+    isRTL?: boolean;
+    isLayoutRTL?: boolean;
 }
 
 const markdownStyles = StyleSheet.create({
@@ -87,6 +89,10 @@ const markdownStyles = StyleSheet.create({
         color: '#333',
         fontSize: 15,
         lineHeight: 22,
+    },
+    bodyRTL: {
+        textAlign: 'right',
+        writingDirection: 'rtl',
     },
     paragraph: {
         marginBottom: 10,
@@ -134,6 +140,8 @@ export function SimpleMarkdownRenderer({
     onBillPaymentCancel,
     onRecommendationApply,
     onRecommendationDetails,
+    isRTL = false,
+    isLayoutRTL = false,
 }: SimpleMarkdownRendererProps) {
 
     const hasTransferPreview = isObject(transferPreview);
@@ -152,12 +160,71 @@ export function SimpleMarkdownRenderer({
     const hasTicketCreated = isObject(ticketCreated);
     const hasRecommendations = recommendations.length > 0;
 
+    const mkStyles = {
+        ...markdownStyles,
+        body: {
+            ...markdownStyles.body,
+            ...(isRTL ? {
+                textAlign: 'right' as const,
+                writingDirection: 'rtl' as const,
+            } : {}),
+        },
+        heading1: isRTL ? {
+            textAlign: 'right' as const,
+            writingDirection: 'rtl' as const,
+        } : {},
+        heading2: isRTL ? {
+            textAlign: 'right' as const,
+            writingDirection: 'rtl' as const,
+        } : {},
+        paragraph: {
+            ...markdownStyles.paragraph,
+            ...(isRTL ? {
+                // In RN, paragraph is a View. We must align its children (Text) to the right.
+                alignItems: 'flex-end' as const,
+                width: '100%' as const,
+            } : {})
+        },
+        // Explicitly style text nodes if possible
+        text: isRTL ? {
+            textAlign: 'right' as const,
+            writingDirection: 'rtl' as const,
+        } : {},
+        textgroup: isRTL ? {
+            textAlign: 'right' as const,
+            writingDirection: 'rtl' as const,
+            alignItems: 'flex-end' as const,
+        } : {},
+        // Fix for lists in RTL
+        bullet_list: isRTL ? {
+            alignItems: 'flex-end' as const,
+        } : {},
+        list_item: isRTL ? {
+            flexDirection: 'row-reverse' as const,
+            justifyContent: 'flex-end' as const,
+        } : {},
+        // Adjust spacing for bullets
+        bullet_list_icon: isRTL ? {
+            marginLeft: 8,
+            marginRight: 0,
+            fontSize: 20,
+        } : {
+            marginLeft: 0,
+            marginRight: 8,
+            fontSize: 20,
+        },
+        bullet_list_content: isRTL ? {
+            alignItems: 'flex-end' as const,
+            textAlign: 'right' as const,
+        } : {},
+    };
+
     return (
         <View style={styles.container}>
             {/* Text Content */}
             {content ? (
-                <View style={styles.bubble}>
-                    <Markdown style={markdownStyles}>
+                <View style={[styles.bubble, isLayoutRTL && styles.bubbleRTL]}>
+                    <Markdown style={mkStyles}>
                         {content}
                     </Markdown>
                 </View>
@@ -323,6 +390,11 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 0,
         alignSelf: 'flex-start',
         maxWidth: '100%',
+    },
+    bubbleRTL: {
+        borderTopLeftRadius: 16,
+        borderTopRightRadius: 0,
+        alignSelf: 'flex-end',
     },
     blocksContainer: {
         gap: 16,

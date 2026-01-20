@@ -85,15 +85,18 @@ export function ChatScreen() {
         setLocale(newLocale);
     };
 
+    // Determine effective layout direction (XOR logic)
+    const isLayoutRTL = isRTL ? !I18nManager.isRTL : I18nManager.isRTL;
+
     // Dynamic styles based on RTL
     const dynamicStyles = {
         header: [
             styles.header,
-            isRTL && styles.headerRTL,
+            isLayoutRTL && styles.headerRTL,
         ],
         headerTitle: [
             styles.headerTitle,
-            isRTL && styles.headerTitleRTL,
+            isRTL && styles.headerTitleRTL, // Title font style depends on language
         ],
         listContent: [
             styles.listContent,
@@ -106,7 +109,7 @@ export function ChatScreen() {
             <View style={dynamicStyles.header}>
                 {/* Language toggle - left side */}
                 <TouchableOpacity
-                    style={[styles.headerButton, isRTL && styles.headerButtonRTL]}
+                    style={[styles.headerButton, isLayoutRTL && styles.headerButtonRTL]}
                     onPress={toggleLanguage}
                 >
                     <Globe size={20} color="#4F008D" />

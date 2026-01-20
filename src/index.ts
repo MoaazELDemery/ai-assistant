@@ -12,9 +12,11 @@ export type { Locale } from './contexts/LocaleContext';
 // Services
 export { ChatService } from './services/ChatService';
 export { VoiceService } from './services/VoiceService';
+export { AppResetManager, CleanupPriority } from './services/AppResetManager';
 
 // Hooks
 export { useSpeech } from './hooks/useSpeech';
+export { useAppReset, useAudioCleanup, useRecordingCleanup } from './hooks/useAppReset';
 
 // Chat Screen (if you want to use directly without wrapper)
 export { ChatScreen } from './views/ChatScreen';

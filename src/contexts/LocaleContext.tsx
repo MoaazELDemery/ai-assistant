@@ -1,14 +1,17 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback, useRef } from 'react';
 import { I18nManager } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AppResetManager } from '../services/AppResetManager';
 
 type Locale = 'en' | 'ar';
 
 interface LocaleContextType {
     locale: Locale;
-    setLocale: (locale: Locale) => void;
+    setLocale: (locale: Locale) => Promise<void>;
     isRTL: boolean;
     t: (key: string) => string;
+    isChangingLocale: boolean;
+    resetKey: number;
 }
 
 const translations: Record<Locale, Record<string, string>> = {
@@ -161,6 +164,14 @@ export function LocaleProvider({
 }) {
     const [locale, setLocaleState] = useState<Locale>(initialLocale);
     const [isReady, setIsReady] = useState(false);
+    const [isChangingLocale, setIsChangingLocale] = useState(false);
+    const [resetKey, setResetKey] = useState(0);
+    const localeRef = useRef(locale);
+
+    // Keep ref in sync
+    useEffect(() => {
+        localeRef.current = locale;
+    }, [locale]);
 
     // Load saved locale on mount
     useEffect(() => {
@@ -169,6 +180,7 @@ export function LocaleProvider({
                 const savedLocale = await AsyncStorage.getItem(LOCALE_STORAGE_KEY);
                 if (savedLocale === 'en' || savedLocale === 'ar') {
                     setLocaleState(savedLocale);
+                    localeRef.current = savedLocale;
 
                     // Set RTL if needed (note: requires app restart to take effect)
                     const shouldBeRTL = savedLocale === 'ar';
@@ -186,22 +198,49 @@ export function LocaleProvider({
         loadLocale();
     }, []);
 
+    /**
+     * Set locale with proper teardown of all services
+     * This is the key method that ensures clean language switching
+     */
     const setLocale = useCallback(async (newLocale: Locale) => {
-        setLocaleState(newLocale);
+        // Skip if same locale
+        if (newLocale === localeRef.current) {
+            console.log('[LocaleContext] Same locale, skipping change');
+            return;
+        }
+
+        console.log(`[LocaleContext] Changing locale from ${localeRef.current} to ${newLocale}`);
+        setIsChangingLocale(true);
 
         try {
+            // STEP 1: Execute full app reset (stops all audio, clears state)
+            console.log('[LocaleContext] Executing app reset...');
+            await AppResetManager.executeReset();
+
+            // STEP 2: Save the new locale
             await AsyncStorage.setItem(LOCALE_STORAGE_KEY, newLocale);
 
-            // Set RTL direction
+            // STEP 3: Set RTL direction
             const shouldBeRTL = newLocale === 'ar';
             if (I18nManager.isRTL !== shouldBeRTL) {
                 I18nManager.allowRTL(shouldBeRTL);
                 I18nManager.forceRTL(shouldBeRTL);
                 // Note: Full RTL requires app restart on React Native
-                // We'll handle visual RTL manually in styles
+                // We handle visual RTL manually in styles
             }
+
+            // STEP 4: Update locale state (this triggers re-renders)
+            setLocaleState(newLocale);
+            localeRef.current = newLocale;
+
+            // STEP 5: Increment reset key to force full tree recreation
+            setResetKey(prev => prev + 1);
+
+            console.log('[LocaleContext] Locale change complete');
         } catch (error) {
-            console.error('Failed to save locale:', error);
+            console.error('[LocaleContext] Failed to change locale:', error);
+        } finally {
+            setIsChangingLocale(false);
         }
     }, []);
 
@@ -214,6 +253,8 @@ export function LocaleProvider({
         setLocale,
         isRTL: locale === 'ar',
         t,
+        isChangingLocale,
+        resetKey,
     };
 
     // Don't render until we've loaded the saved locale

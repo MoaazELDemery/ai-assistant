@@ -1,21 +1,15 @@
 import ExpoModulesCore
 import WebKit
 
-// This view will be used as a native component. Make sure to inherit from `ExpoView`
-// to apply the proper styling (e.g. border radius and shadows).
 class AiAssistantView: ExpoView {
   let webView = WKWebView()
   let onLoad = EventDispatcher()
-  var delegate: WebViewDelegate?
 
   required init(appContext: AppContext? = nil) {
     super.init(appContext: appContext)
     clipsToBounds = true
-    delegate = WebViewDelegate { url in
-      self.onLoad(["url": url])
-    }
-    webView.navigationDelegate = delegate
     addSubview(webView)
+    webView.navigationDelegate = self
   }
 
   override func layoutSubviews() {
@@ -23,16 +17,10 @@ class AiAssistantView: ExpoView {
   }
 }
 
-class WebViewDelegate: NSObject, WKNavigationDelegate {
-  let onUrlChange: (String) -> Void
-
-  init(onUrlChange: @escaping (String) -> Void) {
-    self.onUrlChange = onUrlChange
-  }
-
-  func webView(_ webView: WKWebView, didFinish navigation: WKNavigation) {
-    if let url = webView.url {
-      onUrlChange(url.absoluteString)
-    }
+extension AiAssistantView: WKNavigationDelegate {
+  func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+    onLoad([
+      "url": webView.url?.absoluteString ?? ""
+    ])
   }
 }

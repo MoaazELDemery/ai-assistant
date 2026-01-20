@@ -1,5 +1,5 @@
 {
-  "android": {
-    "package": "com.anonymous.aiassistant"
+  "ios": {
+    "bundleIdentifier": "com.anonymous.ai-assistant"
   }
 }
