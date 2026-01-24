@@ -11,9 +11,6 @@ yarn-error.log*
 # TypeScript
 *.tsbuildinfo
 
-# Testing
-coverage/
-
 # OS
 Thumbs.db
 ehthumbs.db
