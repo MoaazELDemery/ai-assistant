@@ -201,6 +201,7 @@ export function ChatMessage({
                             onBillPaymentCancel={onBillPaymentCancel}
                             onRecommendationApply={onRecommendationApply}
                             onRecommendationDetails={onRecommendationDetails}
+                            isRTL={isRTL}
                         />
 
                         {/* Speech toggle button for assistant messages */}

@@ -180,9 +180,8 @@ export function SimpleMarkdownRenderer({
         paragraph: {
             ...markdownStyles.paragraph,
             ...(isRTL ? {
-                // In RN, paragraph is a View. We must align its children (Text) to the right.
-                alignItems: 'flex-end' as const,
-                width: '100%' as const,
+                flexDirection: 'row' as const,
+                justifyContent: 'flex-start' as const,
             } : {})
         },
         // Explicitly style text nodes if possible

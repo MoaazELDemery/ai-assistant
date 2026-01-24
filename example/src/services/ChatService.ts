@@ -1,6 +1,8 @@
 import { SpendingBreakdown } from '../types';
 import { ENV } from '../config/constants';
+import { ApiService } from './ApiService';
 
+// Keep mock data imports as fallbacks when API is unavailable
 import { mockAccounts } from '../data/accounts';
 import { mockBeneficiaries } from '../data/beneficiaries';
 import { mockCards } from '../data/cards';
@@ -25,8 +27,8 @@ function getMockResponse(message: string, sessionId: string, locale: string): an
             lowerMessage.includes('مرتبط بالراتب') || lowerMessage.includes('ادخار مرتبط')) {
             return {
                 message: isAr
-                    ? 'اختيار رائع! بما أن راتبك يُحوّل إلى بنك stc، فأنت مؤهل. ما النسبة المئوية من راتبك التي تود ادخارها تلقائياً كل شهر؟ (الموصى به: 10-20%)'
-                    : "Great choice! Since your salary is transferred to STC Bank, you're eligible. What percentage of your salary would you like to save automatically each month? (Recommended: 10-20%)",
+                    ? 'اختيار رائع! بما أن راتبك يُحوّل إلى بنك AJB، فأنت مؤهل. ما النسبة المئوية من راتبك التي تود ادخارها تلقائياً كل شهر؟ (الموصى به: 10-20%)'
+                    : "Great choice! Since your salary is transferred to AJB Bank, you're eligible. What percentage of your salary would you like to save automatically each month? (Recommended: 10-20%)",
                 sessionId,
                 ui: {
                     showAccounts: false,
@@ -338,8 +340,8 @@ function getMockResponse(message: string, sessionId: string, locale: string): an
             lowerMessage.includes('مرتبط بالراتب')) {
             return {
                 message: isAr
-                    ? `**ادخار مرتبط بالراتب**\n\nهذا المنتج يخصم نسبة تختارها من راتبك تلقائياً بمجرد استلامه، قبل أن تنفق.\n\n**المميزات:**\n• معدل ادخار يصل إلى 4%\n• بدون رسوم\n• سحب مرن في أي وقت\n• تتبع التقدم عبر التطبيق\n\n**المتطلبات:**\n• تحويل الراتب إلى حساب stc bank\n• الحد الأدنى للادخار: 5% من الراتب\n\nهل تود التقديم الآن؟`
-                    : `**Salary-Linked Savings**\n\nThis product automatically deducts a percentage you choose from your salary as soon as you receive it, before you spend.\n\n**Features:**\n• Savings rate up to 4%\n• No fees\n• Flexible withdrawal anytime\n• Track progress in the app\n\n**Requirements:**\n• Salary must be transferred to STC Bank account\n• Minimum savings: 5% of salary\n\nWould you like to apply now?`,
+                    ? `**ادخار مرتبط بالراتب**\n\nهذا المنتج يخصم نسبة تختارها من راتبك تلقائياً بمجرد استلامه، قبل أن تنفق.\n\n**المميزات:**\n• معدل ادخار يصل إلى 4%\n• بدون رسوم\n• سحب مرن في أي وقت\n• تتبع التقدم عبر التطبيق\n\n**المتطلبات:**\n• تحويل الراتب إلى حساب AJB bank\n• الحد الأدنى للادخار: 5% من الراتب\n\nهل تود التقديم الآن؟`
+                    : `**Salary-Linked Savings**\n\nThis product automatically deducts a percentage you choose from your salary as soon as you receive it, before you spend.\n\n**Features:**\n• Savings rate up to 4%\n• No fees\n• Flexible withdrawal anytime\n• Track progress in the app\n\n**Requirements:**\n• Salary must be transferred to AJB Bank account\n• Minimum savings: 5% of salary\n\nWould you like to apply now?`,
                 sessionId,
                 ui: {
                     showAccounts: false,
@@ -784,7 +786,7 @@ function getMockResponse(message: string, sessionId: string, locale: string): an
         lowerMessage.includes('أهلا') || lowerMessage === '') {
         if (isAr) {
             return {
-                message: `مرحباً! أنا مساعد بنك stc الذكي. يمكنني مساعدتك في:
+                message: `مرحباً! أنا مساعد بنك AJB الذكي. يمكنني مساعدتك في:
 
 • عرض أرصدة الحسابات
 • إجراء التحويلات (محلية ودولية)
@@ -812,7 +814,7 @@ function getMockResponse(message: string, sessionId: string, locale: string): an
             };
         }
         return {
-            message: `Hello! I'm your STC Bank AI Assistant. I can help you with:
+            message: `Hello! I'm your AJB Bank AI Assistant. I can help you with:
 
 • View account balances
 • Make transfers (national & international)
@@ -900,7 +902,7 @@ export class ChatService {
             // If no structured response, just return the data with mock data attached
             if (!data.structured) {
                 console.log('ChatService: No structured data, using direct response');
-                return attachMockData(data);
+                return await attachMockData(data);
             }
 
             let parsed: any;
@@ -930,7 +932,7 @@ export class ChatService {
             }
 
             // Attach mock data based on UI flags (same as web app)
-            return attachMockData(parsed);
+            return await attachMockData(parsed);
 
         } catch (error) {
             console.error('ChatService: Error calling N8N:', error);
@@ -948,42 +950,125 @@ export class ChatService {
     }
 
     static async fetchInitialData() {
-        return {
-            accounts: mockAccounts,
-            beneficiaries: mockBeneficiaries,
-            cards: mockCards,
-            bills: mockBills,
-            spendingBreakdown: mockSpendingBreakdown,
-            subscriptions: mockSubscriptions,
-        };
+        try {
+            // Fetch data from API server
+            const [accounts, beneficiaries, billsResponse, spendingBreakdown, cards, subscriptions] = await Promise.all([
+                ApiService.getAccounts(),
+                ApiService.getBeneficiaries(),
+                ApiService.getBills(),
+                ApiService.getSpendingBreakdown(),
+                ApiService.getCards(),
+                ApiService.getSubscriptions(),
+            ]);
+
+            console.log('[ChatService] Fetched initial data from API');
+            return {
+                accounts: accounts.length > 0 ? accounts : mockAccounts,
+                beneficiaries: beneficiaries.length > 0 ? beneficiaries : mockBeneficiaries,
+                cards: cards.length > 0 ? cards : mockCards,
+                bills: billsResponse.bills.length > 0 ? billsResponse.bills : mockBills,
+                spendingBreakdown: spendingBreakdown.length > 0 ? spendingBreakdown : mockSpendingBreakdown,
+                subscriptions: subscriptions.length > 0 ? subscriptions : mockSubscriptions,
+            };
+        } catch (error) {
+            console.error('[ChatService] Failed to fetch initial data from API, using mock data:', error);
+            return {
+                accounts: mockAccounts,
+                beneficiaries: mockBeneficiaries,
+                cards: mockCards,
+                bills: mockBills,
+                spendingBreakdown: mockSpendingBreakdown,
+                subscriptions: mockSubscriptions,
+            };
+        }
     }
 }
 
-// Attach mock data based on UI flags from N8N response
-function attachMockData(parsed: any): any {
+// Attach data based on UI flags from N8N response - fetches from API with mock fallback
+async function attachMockData(parsed: any): Promise<any> {
     const result = { ...parsed };
 
+    // Fetch data from API based on UI flags
+    const fetchPromises: Promise<void>[] = [];
+
     if (parsed.ui?.showAccounts) {
-        result.accounts = mockAccounts;
+        fetchPromises.push(
+            ApiService.getAccounts()
+                .then(accounts => {
+                    result.accounts = accounts.length > 0 ? accounts : mockAccounts;
+                })
+                .catch(() => {
+                    result.accounts = mockAccounts;
+                })
+        );
     }
+
     if (parsed.ui?.showBeneficiaries) {
-        result.beneficiaries = mockBeneficiaries;
+        fetchPromises.push(
+            ApiService.getBeneficiaries()
+                .then(beneficiaries => {
+                    result.beneficiaries = beneficiaries.length > 0 ? beneficiaries : mockBeneficiaries;
+                })
+                .catch(() => {
+                    result.beneficiaries = mockBeneficiaries;
+                })
+        );
     }
+
     if (parsed.ui?.showCards) {
-        result.cards = mockCards;
+        fetchPromises.push(
+            ApiService.getCards()
+                .then(cards => {
+                    result.cards = cards.length > 0 ? cards : mockCards;
+                })
+                .catch(() => {
+                    result.cards = mockCards;
+                })
+        );
     }
+
     if (parsed.ui?.showBills) {
-        result.bills = mockBills;
+        fetchPromises.push(
+            ApiService.getBills()
+                .then(response => {
+                    result.bills = response.bills.length > 0 ? response.bills : mockBills;
+                })
+                .catch(() => {
+                    result.bills = mockBills;
+                })
+        );
     }
+
     if (parsed.ui?.showSpendingBreakdown) {
-        // Only use mock data as fallback if N8N response doesn't include spending data
+        // Only fetch if N8N response doesn't include spending data
         if (!result.spendingBreakdown || result.spendingBreakdown.length === 0) {
-            result.spendingBreakdown = generateRandomSpendingBreakdown();
+            fetchPromises.push(
+                ApiService.getSpendingBreakdown()
+                    .then(breakdown => {
+                        result.spendingBreakdown = breakdown.length > 0 ? breakdown : generateRandomSpendingBreakdown();
+                    })
+                    .catch(() => {
+                        result.spendingBreakdown = generateRandomSpendingBreakdown();
+                    })
+            );
         }
     }
+
     if (parsed.ui?.showSubscriptions) {
-        result.subscriptions = mockSubscriptions;
+        fetchPromises.push(
+            ApiService.getSubscriptions()
+                .then(subscriptions => {
+                    result.subscriptions = subscriptions.length > 0 ? subscriptions : mockSubscriptions;
+                })
+                .catch(() => {
+                    result.subscriptions = mockSubscriptions;
+                })
+        );
     }
+
+    // Wait for all API calls to complete
+    await Promise.all(fetchPromises);
+
     if (parsed.ui?.spendingInsights) {
         result.spendingInsights = parsed.ui.spendingInsights;
     }

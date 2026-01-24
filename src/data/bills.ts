@@ -48,8 +48,8 @@ export const mockBills: Bill[] = [
     {
         id: 'bill-005',
         type: 'credit_card',
-        providerName: 'stc bank Credit Card',
-        providerNameAr: 'بطاقة ستي سي بنك الائتمانية',
+        providerName: 'AJB bank Credit Card',
+        providerNameAr: 'بطاقة بنك الجزيرة الائتمانية',
         accountNumber: '**** **** **** 4532',
         amount: 3250.0,
         dueDate: '2024-12-26T23:59:59Z',

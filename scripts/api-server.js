@@ -196,6 +196,325 @@ const mockProducts = [
     },
 ];
 
+const mockBills = [
+    {
+        id: 'bill-001',
+        type: 'electricity',
+        providerName: 'Saudi Electricity Company',
+        providerNameAr: 'الشركة السعودية للكهرباء',
+        accountNumber: '1234567890',
+        amount: 450.0,
+        dueDate: '2024-12-28T23:59:59Z',
+        status: 'pending',
+        isPriority: true,
+    },
+    {
+        id: 'bill-002',
+        type: 'water',
+        providerName: 'National Water Company',
+        providerNameAr: 'شركة المياه الوطنية',
+        accountNumber: '9876543210',
+        amount: 120.0,
+        dueDate: '2024-12-30T23:59:59Z',
+        status: 'pending',
+        isPriority: false,
+    },
+    {
+        id: 'bill-003',
+        type: 'internet',
+        providerName: 'stc',
+        providerNameAr: 'اس تي سي',
+        accountNumber: '5551234567',
+        amount: 299.0,
+        dueDate: '2025-01-05T23:59:59Z',
+        status: 'pending',
+        isPriority: false,
+    },
+    {
+        id: 'bill-004',
+        type: 'phone',
+        providerName: 'Mobily',
+        providerNameAr: 'موبايلي',
+        accountNumber: '0501234567',
+        amount: 180.0,
+        dueDate: '2025-01-10T23:59:59Z',
+        status: 'pending',
+        isPriority: false,
+    },
+    {
+        id: 'bill-005',
+        type: 'credit_card',
+        providerName: 'stc bank Credit Card',
+        providerNameAr: 'بطاقة ستي سي بنك الائتمانية',
+        accountNumber: '**** **** **** 4532',
+        amount: 3250.0,
+        dueDate: '2024-12-26T23:59:59Z',
+        status: 'overdue',
+        isPriority: true,
+    },
+    {
+        id: 'bill-006',
+        type: 'government',
+        providerName: 'Traffic Department',
+        providerNameAr: 'إدارة المرور',
+        accountNumber: 'VIO-2024-1234',
+        amount: 500.0,
+        dueDate: '2024-12-25T23:59:59Z',
+        status: 'overdue',
+        isPriority: true,
+    },
+    {
+        id: 'bill-007',
+        type: 'electricity',
+        providerName: 'Saudi Electricity Company',
+        providerNameAr: 'الشركة السعودية للكهرباء',
+        accountNumber: '1234567890',
+        amount: 420.0,
+        dueDate: '2024-11-28T23:59:59Z',
+        status: 'paid',
+        isPriority: false,
+    },
+    {
+        id: 'bill-008',
+        type: 'water',
+        providerName: 'National Water Company',
+        providerNameAr: 'شركة المياه الوطنية',
+        accountNumber: '9876543210',
+        amount: 115.0,
+        dueDate: '2024-11-30T23:59:59Z',
+        status: 'paid',
+        isPriority: false,
+    },
+];
+
+const mockTransfers = [
+    {
+        id: 'txn-001',
+        fromAccountId: 'acc-001',
+        beneficiaryId: 'ben-001',
+        amount: 5000,
+        currency: 'SAR',
+        purpose: 'family_support',
+        reference: 'Monthly support',
+        type: 'national',
+        status: 'completed',
+        createdAt: '2024-11-28T10:30:00Z',
+        completedAt: '2024-11-28T10:31:00Z',
+    },
+    {
+        id: 'txn-002',
+        fromAccountId: 'acc-001',
+        beneficiaryId: 'ben-004',
+        amount: 2000,
+        currency: 'USD',
+        convertedAmount: 7500,
+        exchangeRate: 3.75,
+        purpose: 'family_support',
+        type: 'international',
+        status: 'completed',
+        createdAt: '2024-11-25T14:15:00Z',
+        completedAt: '2024-11-25T14:20:00Z',
+    },
+    {
+        id: 'txn-003',
+        fromAccountId: 'acc-002',
+        beneficiaryId: 'ben-002',
+        amount: 1500,
+        currency: 'SAR',
+        purpose: 'business',
+        reference: 'Invoice #1234',
+        type: 'national',
+        status: 'completed',
+        createdAt: '2024-11-20T09:00:00Z',
+        completedAt: '2024-11-20T09:01:00Z',
+    },
+    {
+        id: 'txn-004',
+        fromAccountId: 'acc-001',
+        beneficiaryId: 'ben-005',
+        amount: 500,
+        currency: 'GBP',
+        convertedAmount: 2344,
+        exchangeRate: 4.688,
+        purpose: 'business',
+        type: 'international',
+        status: 'completed',
+        createdAt: '2024-11-15T16:45:00Z',
+        completedAt: '2024-11-15T16:50:00Z',
+    },
+];
+
+// In-memory store for pending transfers (requires OTP confirmation)
+let pendingTransfers = new Map();
+
+const mockCards = [
+    {
+        id: 'card-001',
+        name: 'Platinum Credit Card',
+        nameAr: 'بطاقة الائتمان البلاتينية',
+        type: 'credit',
+        lastFourDigits: '4521',
+        cardNumber: '**** **** **** 4521',
+        expiryDate: '12/27',
+        status: 'active',
+        linkedAccountId: 'acc-001',
+        limits: {
+            dailyLimit: 50000,
+            transactionLimit: 20000,
+            currentDailyUsage: 12500,
+        },
+        settings: {
+            internationalTransactions: true,
+            onlineTransactions: true,
+            contactlessPayments: true,
+        },
+        cardNetwork: 'visa',
+    },
+    {
+        id: 'card-002',
+        name: 'Debit Card',
+        nameAr: 'بطاقة الصراف الآلي',
+        type: 'debit',
+        lastFourDigits: '8834',
+        cardNumber: '**** **** **** 8834',
+        expiryDate: '09/26',
+        status: 'active',
+        linkedAccountId: 'acc-002',
+        limits: {
+            dailyLimit: 15000,
+            transactionLimit: 5000,
+            currentDailyUsage: 3200,
+        },
+        settings: {
+            internationalTransactions: false,
+            onlineTransactions: true,
+            contactlessPayments: true,
+        },
+        cardNetwork: 'mada',
+    },
+    {
+        id: 'card-003',
+        name: 'Gold Credit Card',
+        nameAr: 'بطاقة الائتمان الذهبية',
+        type: 'credit',
+        lastFourDigits: '2156',
+        cardNumber: '**** **** **** 2156',
+        expiryDate: '06/28',
+        status: 'frozen',
+        linkedAccountId: 'acc-001',
+        limits: {
+            dailyLimit: 30000,
+            transactionLimit: 15000,
+            currentDailyUsage: 0,
+        },
+        settings: {
+            internationalTransactions: true,
+            onlineTransactions: false,
+            contactlessPayments: true,
+        },
+        cardNetwork: 'mastercard',
+    },
+];
+
+const mockSubscriptions = [
+    {
+        id: 'sub-1',
+        name: 'Netflix Premium',
+        nameAr: 'نتفلكس بريميوم',
+        merchantName: 'Netflix',
+        amount: 63.99,
+        currency: 'SAR',
+        frequency: 'monthly',
+        nextBillingDate: '2025-01-15T00:00:00Z',
+        category: 'entertainment',
+        isActive: true,
+    },
+    {
+        id: 'sub-2',
+        name: 'Spotify Premium',
+        nameAr: 'سبوتيفاي بريميوم',
+        merchantName: 'Spotify',
+        amount: 19.99,
+        currency: 'SAR',
+        frequency: 'monthly',
+        nextBillingDate: '2025-01-10T00:00:00Z',
+        category: 'entertainment',
+        isActive: true,
+    },
+    {
+        id: 'sub-3',
+        name: 'Apple iCloud Storage',
+        nameAr: 'مساحة تخزين آي كلاود',
+        merchantName: 'Apple',
+        amount: 11.99,
+        currency: 'SAR',
+        frequency: 'monthly',
+        nextBillingDate: '2025-01-05T00:00:00Z',
+        category: 'technology',
+        isActive: true,
+    },
+    {
+        id: 'sub-4',
+        name: 'Fitness Time Membership',
+        nameAr: 'عضوية فتنس تايم',
+        merchantName: 'Fitness Time',
+        amount: 500.0,
+        currency: 'SAR',
+        frequency: 'monthly',
+        nextBillingDate: '2025-01-01T00:00:00Z',
+        category: 'health',
+        isActive: true,
+    },
+    {
+        id: 'sub-5',
+        name: 'Amazon Prime',
+        nameAr: 'أمازون برايم',
+        merchantName: 'Amazon',
+        amount: 16.0,
+        currency: 'SAR',
+        frequency: 'monthly',
+        nextBillingDate: '2025-01-20T00:00:00Z',
+        category: 'shopping',
+        isActive: true,
+    },
+    {
+        id: 'sub-6',
+        name: 'Adobe Creative Cloud',
+        nameAr: 'أدوبي كريتف كلاود',
+        merchantName: 'Adobe',
+        amount: 149.99,
+        currency: 'SAR',
+        frequency: 'monthly',
+        nextBillingDate: '2025-01-12T00:00:00Z',
+        category: 'technology',
+        isActive: true,
+    },
+    {
+        id: 'sub-7',
+        name: 'Disney+ Annual',
+        nameAr: 'ديزني بلس سنوي',
+        merchantName: 'Disney+',
+        amount: 299.99,
+        currency: 'SAR',
+        frequency: 'yearly',
+        nextBillingDate: '2025-06-15T00:00:00Z',
+        category: 'entertainment',
+        isActive: true,
+    },
+    {
+        id: 'sub-8',
+        name: 'The Economist Digital',
+        nameAr: 'ذا إيكونومست الرقمي',
+        merchantName: 'The Economist',
+        amount: 45.0,
+        currency: 'SAR',
+        frequency: 'monthly',
+        nextBillingDate: '2025-01-08T00:00:00Z',
+        category: 'news',
+        isActive: false,
+    },
+];
+
 const mockExchangeRates = {
     base: 'SAR',
     rates: {
@@ -475,6 +794,180 @@ const server = http.createServer(async (req, res) => {
         return sendJson(res, data);
     }
 
+    // Bills API
+    if (path === '/api/bills' && method === 'GET') {
+        const status = url.searchParams.get('status');
+        const type = url.searchParams.get('type');
+
+        let filtered = mockBills;
+
+        // Filter by status
+        if (status && status !== 'all') {
+            filtered = filtered.filter(bill => bill.status === status);
+        }
+
+        // Filter by type
+        if (type) {
+            filtered = filtered.filter(bill => bill.type === type);
+        }
+
+        // Calculate total amount
+        const totalAmount = filtered.reduce((sum, bill) => sum + bill.amount, 0);
+
+        return sendJson(res, {
+            bills: filtered,
+            count: filtered.length,
+            totalAmount,
+            currency: 'SAR',
+        });
+    }
+
+    // Bills by ID
+    if (path.startsWith('/api/bills/') && path.includes('/pay') && method === 'POST') {
+        const billId = path.split('/')[3];
+        const bill = mockBills.find(b => b.id === billId);
+
+        if (!bill) {
+            return sendJson(res, { error: 'Bill not found' }, 404);
+        }
+
+        // Simulate payment
+        bill.status = 'paid';
+
+        return sendJson(res, {
+            success: true,
+            message: 'Bill paid successfully',
+            bill,
+            reference: `BP-${Date.now()}`,
+        });
+    }
+
+    // Transfers API
+    if (path === '/api/transfers') {
+        if (method === 'GET') {
+            const limit = parseInt(url.searchParams.get('limit') || '10');
+            const status = url.searchParams.get('status');
+
+            let filtered = mockTransfers;
+            if (status && status !== 'all') {
+                filtered = mockTransfers.filter(t => t.status === status);
+            }
+
+            return sendJson(res, {
+                transfers: filtered.slice(0, limit),
+                total: filtered.length,
+            });
+        }
+
+        if (method === 'POST') {
+            const body = await parseBody(req);
+
+            // Validate account exists
+            const account = mockAccounts.find(a => a.id === body.fromAccountId);
+            if (!account) {
+                return sendJson(res, { error: 'Account not found' }, 404);
+            }
+
+            // Validate beneficiary exists
+            const beneficiary = mockBeneficiaries.find(b => b.id === body.beneficiaryId);
+            if (!beneficiary) {
+                return sendJson(res, { error: 'Beneficiary not found' }, 404);
+            }
+
+            // Check sufficient balance
+            if (account.balance < body.amount) {
+                return sendJson(res, { error: 'Insufficient balance' }, 400);
+            }
+
+            const newTransfer = {
+                id: `txn-${Date.now()}`,
+                fromAccountId: body.fromAccountId,
+                beneficiaryId: body.beneficiaryId,
+                amount: body.amount,
+                currency: body.currency || 'SAR',
+                convertedAmount: body.convertedAmount,
+                exchangeRate: body.exchangeRate,
+                purpose: body.purpose || 'other',
+                reference: body.reference,
+                type: body.type || 'national',
+                status: 'pending',
+                createdAt: new Date().toISOString(),
+            };
+
+            // Store as pending (requires OTP confirmation)
+            pendingTransfers.set(newTransfer.id, newTransfer);
+
+            return sendJson(res, {
+                transfer: newTransfer,
+                fromAccountName: account.name,
+                beneficiaryName: beneficiary.name,
+                transferType: beneficiary.type,
+                requiresOtp: true,
+                message: 'Transfer created. Please confirm with OTP.',
+            }, 201);
+        }
+    }
+
+    // Transfer confirm
+    if (path.startsWith('/api/transfers/') && path.includes('/confirm') && method === 'POST') {
+        const transferId = path.split('/')[3];
+        const transfer = pendingTransfers.get(transferId);
+
+        if (!transfer) {
+            return sendJson(res, { error: 'Transfer not found or already processed' }, 404);
+        }
+
+        // Complete the transfer
+        transfer.status = 'completed';
+        transfer.completedAt = new Date().toISOString();
+        mockTransfers.push(transfer);
+        pendingTransfers.delete(transferId);
+
+        return sendJson(res, {
+            success: true,
+            transfer,
+            message: 'Transfer completed successfully',
+        });
+    }
+
+    // Cards API
+    if (path === '/api/cards' && method === 'GET') {
+        const type = url.searchParams.get('type');
+        let filtered = mockCards;
+
+        if (type) {
+            filtered = mockCards.filter(card => card.type === type);
+        }
+
+        return sendJson(res, {
+            cards: filtered,
+            count: filtered.length,
+        });
+    }
+
+    // Subscriptions API
+    if (path === '/api/subscriptions' && method === 'GET') {
+        const active = url.searchParams.get('active');
+        let filtered = mockSubscriptions;
+
+        if (active === 'true') {
+            filtered = mockSubscriptions.filter(sub => sub.isActive);
+        } else if (active === 'false') {
+            filtered = mockSubscriptions.filter(sub => !sub.isActive);
+        }
+
+        const monthlyTotal = filtered
+            .filter(sub => sub.frequency === 'monthly' && sub.isActive)
+            .reduce((sum, sub) => sum + sub.amount, 0);
+
+        return sendJson(res, {
+            subscriptions: filtered,
+            count: filtered.length,
+            monthlyTotal,
+            currency: 'SAR',
+        });
+    }
+
     // 404
     sendJson(res, { error: 'Not Found', path }, 404);
 });
@@ -491,6 +984,13 @@ server.listen(PORT, () => {
 ║   GET  /api/accounts         - User accounts               ║
 ║   GET  /api/beneficiaries    - Payment beneficiaries       ║
 ║   POST /api/beneficiaries    - Add new beneficiary         ║
+║   GET  /api/bills            - User bills                  ║
+║   POST /api/bills/:id/pay    - Pay a bill                  ║
+║   GET  /api/transfers        - Transfer history            ║
+║   POST /api/transfers        - Create new transfer         ║
+║   POST /api/transfers/:id/confirm - Confirm transfer       ║
+║   GET  /api/cards            - User cards                  ║
+║   GET  /api/subscriptions    - User subscriptions          ║
 ║   GET  /api/products         - Bank products catalog       ║
 ║   GET  /api/exchange-rates   - Currency exchange rates     ║
 ║   GET  /api/spending/breakdown - Spending analytics        ║

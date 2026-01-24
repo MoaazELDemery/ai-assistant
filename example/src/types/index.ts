@@ -314,3 +314,22 @@ export interface TicketCreated {
     ticketNumber: string;
     estimatedResolutionTime: string;
 }
+
+// Product Types
+export interface Product {
+    id: string;
+    name: string;
+    nameAr: string;
+    category: 'lending' | 'saving' | 'credit_card' | 'investment';
+    type: string;
+    icon: string;
+    benefit: string;
+    benefitAr: string;
+    eligibilityNote?: string;
+    eligibilityNoteAr?: string;
+    isPromoted?: boolean;
+    minSalary?: number;
+    minAmount?: number;
+    maxAmount?: number;
+}
+

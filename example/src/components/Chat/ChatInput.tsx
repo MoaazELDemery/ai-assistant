@@ -77,7 +77,9 @@ export function ChatInput({
                         {isLoading ? (
                             <ActivityIndicator color="#fff" size="small" />
                         ) : (
-                            <Send size={20} color="#fff" style={isRTL ? { transform: [{ scaleX: -1 }] } : undefined} />
+                            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                                <Send size={20} color="#fff" />
+                            </View>
                         )}
                     </TouchableOpacity>
                 ) : (

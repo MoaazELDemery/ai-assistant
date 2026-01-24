@@ -1,11 +1,17 @@
 {
   "expo": {
-    "name": "AI Assistant",
-    "slug": "ai-assistant",
+    "name": "NEXUS AI",
+    "slug": "nexus-ai",
     "version": "1.0.0",
     "orientation": "portrait",
-    "scheme": "aiassistant",
+    "icon": "./assets/logo.jpg",
+    "scheme": "nexus-ai",
     "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/logo.jpg",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
     "assetBundlePatterns": [
       "**/*"
     ],
@@ -41,6 +47,7 @@
     },
     "android": {
       "adaptiveIcon": {
+        "foregroundImage": "./assets/logo.jpg",
         "backgroundColor": "#ffffff"
       },
       "package": "com.demery.aiassistant",

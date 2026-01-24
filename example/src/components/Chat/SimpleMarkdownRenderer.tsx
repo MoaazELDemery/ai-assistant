@@ -80,6 +80,7 @@ interface SimpleMarkdownRendererProps {
     onBillPaymentCancel?: () => void;
     onRecommendationApply?: (recommendation: Recommendation) => void;
     onRecommendationDetails?: (recommendation: Recommendation) => void;
+    isRTL?: boolean;
 }
 
 const markdownStyles = StyleSheet.create({
@@ -134,6 +135,7 @@ export function SimpleMarkdownRenderer({
     onBillPaymentCancel,
     onRecommendationApply,
     onRecommendationDetails,
+    isRTL = false,
 }: SimpleMarkdownRendererProps) {
 
     const hasTransferPreview = isObject(transferPreview);
@@ -152,12 +154,52 @@ export function SimpleMarkdownRenderer({
     const hasTicketCreated = isObject(ticketCreated);
     const hasRecommendations = recommendations.length > 0;
 
+    // RTL-aware markdown styles
+    const mkStyles = {
+        ...markdownStyles,
+        body: {
+            ...markdownStyles.body,
+            ...(isRTL ? {
+                textAlign: 'right' as const,
+                writingDirection: 'rtl' as const,
+            } : {}),
+        },
+        paragraph: {
+            ...markdownStyles.paragraph,
+            ...(isRTL ? {
+                flexDirection: 'row' as const,
+                justifyContent: 'flex-start' as const,
+            } : {})
+        },
+        text: isRTL ? {
+            textAlign: 'right' as const,
+            writingDirection: 'rtl' as const,
+        } : {},
+        bullet_list: isRTL ? {
+            alignItems: 'flex-end' as const,
+        } : {},
+        list_item: isRTL ? {
+            flexDirection: 'row-reverse' as const,
+            justifyContent: 'flex-end' as const,
+        } : {},
+        bullet_list_icon: isRTL ? {
+            marginLeft: 8,
+            marginRight: 0,
+        } : {
+            marginLeft: 0,
+            marginRight: 8,
+        },
+        bullet_list_content: isRTL ? {
+            textAlign: 'right' as const,
+        } : {},
+    };
+
     return (
         <View style={styles.container}>
             {/* Text Content */}
             {content ? (
-                <View style={styles.bubble}>
-                    <Markdown style={markdownStyles}>
+                <View style={[styles.bubble, isRTL && styles.bubbleRTL]}>
+                    <Markdown style={mkStyles}>
                         {content}
                     </Markdown>
                 </View>
@@ -323,6 +365,11 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 0,
         alignSelf: 'flex-start',
         maxWidth: '100%',
+    },
+    bubbleRTL: {
+        borderTopLeftRadius: 16,
+        borderTopRightRadius: 0,
+        alignSelf: 'flex-end',
     },
     blocksContainer: {
         gap: 16,
