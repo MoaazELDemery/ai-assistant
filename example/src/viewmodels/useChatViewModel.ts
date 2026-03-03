@@ -157,7 +157,7 @@ export function useChatViewModel(options: UseChatViewModelOptions = {}) {
 
                     while (retries > 0 && !text) {
                         try {
-                            text = await VoiceService.speechToText(uri);
+                            text = await VoiceService.speechToText(uri, locale);
                         } catch (sttError: any) {
                             retries--;
                             if (retries > 0) {

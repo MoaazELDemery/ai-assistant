@@ -2,7 +2,7 @@
 async function testParams() {
     try {
         console.log("Testing with chatInput...");
-        const response = await fetch('http://159.89.8.87:5678/webhook/stc-chat', {
+        const response = await fetch('https://n8n.axonagent.app/webhook/stc-chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

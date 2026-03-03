@@ -17,6 +17,21 @@ export function ChatScreen() {
     const [autoSpeak, setAutoSpeak] = React.useState(true);
     const lastMessageIdRef = useRef<string | null>(null);
     const prevLocaleRef = useRef(locale);
+    const speechTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    // Helper to cancel any pending speech timeout
+    const cancelPendingSpeech = useCallback(() => {
+        if (speechTimeoutRef.current) {
+            clearTimeout(speechTimeoutRef.current);
+            speechTimeoutRef.current = null;
+        }
+    }, []);
+
+    // Helper to stop all speech (current + pending)
+    const stopAllSpeech = useCallback(() => {
+        cancelPendingSpeech();
+        stop();
+    }, [cancelPendingSpeech, stop]);
 
     useEffect(() => {
         // Scroll to bottom on new messages or when typing indicator appears
@@ -31,10 +46,10 @@ export function ChatScreen() {
     useEffect(() => {
         if (prevLocaleRef.current !== locale) {
             prevLocaleRef.current = locale;
-            stop(); // Stop any ongoing speech
+            stopAllSpeech(); // Stop all speech (current + pending)
             lastMessageIdRef.current = null; // Reset so welcome message can be spoken
         }
-    }, [locale, stop]);
+    }, [locale, stopAllSpeech]);
 
     // Auto-speak new assistant messages
     useEffect(() => {
@@ -49,33 +64,42 @@ export function ChatScreen() {
             lastMessage.id !== lastMessageIdRef.current
         ) {
             lastMessageIdRef.current = lastMessage.id;
+
+            // Cancel any pending speech first
+            cancelPendingSpeech();
+
+            // Stop current speech before scheduling new one
+            stop();
+
             // Small delay to ensure the message is rendered
-            setTimeout(() => {
+            speechTimeoutRef.current = setTimeout(() => {
+                speechTimeoutRef.current = null;
                 speak(lastMessage.content, lastMessage.id);
             }, 500);
         }
-    }, [messages, autoSpeak, speak]);
+    }, [messages, autoSpeak, speak, stop, cancelPendingSpeech]);
 
     // Stop speech when user starts recording
     useEffect(() => {
         if (isRecording) {
-            stop();
+            stopAllSpeech();
         }
-    }, [isRecording, stop]);
+    }, [isRecording, stopAllSpeech]);
 
     const handleSpeechToggle = useCallback((text: string, messageId: string) => {
         // If this message is currently speaking/loading, stop it
         if (currentMessageId === messageId && (isSpeaking || isLoadingSpeech)) {
-            stop();
+            stopAllSpeech();
         } else {
-            // Otherwise, speak this message
+            // Stop any other speech and speak this message
+            stopAllSpeech();
             speak(text, messageId);
         }
-    }, [currentMessageId, isSpeaking, isLoadingSpeech, stop, speak]);
+    }, [currentMessageId, isSpeaking, isLoadingSpeech, stopAllSpeech, speak]);
 
     const toggleAutoSpeak = () => {
-        if (autoSpeak && isSpeaking) {
-            stop();
+        if (autoSpeak && (isSpeaking || isLoadingSpeech)) {
+            stopAllSpeech();
         }
         setAutoSpeak(!autoSpeak);
     };
@@ -162,7 +186,7 @@ export function ChatScreen() {
 
                 <ChatInput
                     onSend={(text) => {
-                        stop(); // Stop any ongoing speech when user sends a message
+                        stopAllSpeech(); // Stop all speech (current + pending) when user sends a message
                         sendMessage(text);
                     }}
                     isLoading={isLoading}

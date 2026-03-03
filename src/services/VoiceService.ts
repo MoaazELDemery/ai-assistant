@@ -21,12 +21,12 @@ export class VoiceService {
         }
     }
 
-    static async speechToText(audioUri: string): Promise<string> {
+    static async speechToText(audioUri: string, language: 'en' | 'ar' = 'en'): Promise<string> {
         try {
             if (ENV.STT_PROVIDER === 'self-hosted') {
-                return await this.transcribeWithSelfHosted(audioUri);
+                return await this.transcribeWithSelfHosted(audioUri, language);
             } else {
-                return await this.transcribeWithOpenAI(audioUri);
+                return await this.transcribeWithOpenAI(audioUri, language);
             }
         } catch (error) {
             console.error('VoiceService STT Error:', error);
@@ -110,7 +110,7 @@ export class VoiceService {
         });
     }
 
-    private static async transcribeWithOpenAI(audioUri: string): Promise<string> {
+    private static async transcribeWithOpenAI(audioUri: string, language: 'en' | 'ar'): Promise<string> {
         const formData = new FormData();
         formData.append('file', {
             uri: audioUri,
@@ -119,6 +119,7 @@ export class VoiceService {
         } as any);
         formData.append('model', 'gpt-4o-transcribe');
         formData.append('response_format', 'json');
+        formData.append('language', language);
 
         const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
             method: 'POST',
@@ -138,7 +139,7 @@ export class VoiceService {
         return result.text;
     }
 
-    private static async transcribeWithSelfHosted(audioUri: string): Promise<string> {
+    private static async transcribeWithSelfHosted(audioUri: string, language: 'en' | 'ar'): Promise<string> {
         const formData = new FormData();
         const fileExtension = audioUri.split('.').pop() || 'm4a';
         const mimeType = fileExtension === 'm4a' ? 'audio/mp4' : `audio/${fileExtension}`;
@@ -150,6 +151,7 @@ export class VoiceService {
             name: filename,
         } as any);
         formData.append('model', 'deepdml/faster-whisper-large-v3-turbo-ct2');
+        formData.append('language', language);
 
         try {
             const response = await fetch(`${ENV.STT_SELF_HOSTED_URL}/v1/audio/transcriptions`, {

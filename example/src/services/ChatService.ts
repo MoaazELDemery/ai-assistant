@@ -878,13 +878,22 @@ export class ChatService {
             // Call N8N webhook FIRST - this matches the web app behavior exactly
             // The web app always calls POST /api/chat which forwards to N8N
             console.log('ChatService: Calling N8N webhook...');
+            // Build language instruction for the AI - embed it in the message so AI definitely sees it
+            const languageInstruction = locale === 'ar'
+                ? '[SYSTEM INSTRUCTION: You MUST respond ONLY in Arabic (العربية). Do not respond in any other language regardless of what language the user writes in.]'
+                : '[SYSTEM INSTRUCTION: You MUST respond ONLY in English. Do not respond in any other language regardless of what language the user writes in.]';
+
+            // Prepend the language instruction to the user's message
+            const chatInputWithLanguage = `${languageInstruction}\n\nUser message: ${content}`;
+
             const response = await fetch(N8N_WEBHOOK_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    chatInput: content,
+                    chatInput: chatInputWithLanguage,
                     sessionId,
                     locale,
+                    responseLanguage: locale === 'ar' ? 'Arabic' : 'English',
                     client: 'react-native',
                     apiUrl: ENV.API_CALLBACK_URL
                 }),
