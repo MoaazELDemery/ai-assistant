@@ -9,23 +9,10 @@ interface UseChatViewModelOptions {
     locale?: Locale;
 }
 
-function getWelcomeMessage(locale: Locale): ChatMessage {
-    const content = locale === 'ar'
-        ? "مرحباً! أنا مساعد بنك AJB الذكي. يمكنني مساعدتك في:\n\n- عرض أرصدة الحسابات\n- إجراء التحويلات\n- إدارة المستفيدين\n- التحقق من أسعار الصرف\n\nكيف يمكنني مساعدتك اليوم؟"
-        : "Hello! I'm your AJB Bank AI Assistant. I can help you with:\n\n- View account balances\n- Make transfers\n- Manage beneficiaries\n- Check exchange rates\n\nHow can I assist you today?";
-
-    return {
-        id: 'welcome',
-        role: 'assistant',
-        content,
-        timestamp: new Date().toISOString(),
-    };
-}
-
 export function useChatViewModel(options: UseChatViewModelOptions = {}) {
     const { locale = 'en' } = options;
 
-    const [messages, setMessages] = useState<ChatMessage[]>([getWelcomeMessage(locale)]);
+    const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [isTranscribing, setIsTranscribing] = useState(false);
     const [sessionId, setSessionId] = useState(() => `session-${Date.now()}`);
@@ -35,10 +22,16 @@ export function useChatViewModel(options: UseChatViewModelOptions = {}) {
     useEffect(() => {
         if (prevLocaleRef.current !== locale) {
             prevLocaleRef.current = locale;
-            setMessages([getWelcomeMessage(locale)]);
+            setMessages([]);
             setSessionId(`session-${Date.now()}`);
         }
     }, [locale]);
+
+    // Reset chat (new session)
+    const resetChat = useCallback(() => {
+        setMessages([]);
+        setSessionId(`session-${Date.now()}`);
+    }, []);
 
     const sendMessage = useCallback(async (content: string) => {
         const userMsg: ChatMessage = {
@@ -189,6 +182,7 @@ export function useChatViewModel(options: UseChatViewModelOptions = {}) {
         isLoading,
         isTranscribing,
         sendMessage,
+        resetChat,
         isRecording,
         startRecording,
         stopRecording,

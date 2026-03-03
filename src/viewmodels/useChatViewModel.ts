@@ -13,23 +13,10 @@ interface UseChatViewModelOptions {
 // Instance counter for unique IDs
 let instanceCounter = 0;
 
-function getWelcomeMessage(locale: Locale): ChatMessage {
-    const content = locale === 'ar'
-        ? "مرحباً! أنا مساعد بنك AJB الذكي. يمكنني مساعدتك في:\n\n- عرض أرصدة الحسابات\n- إجراء التحويلات\n- إدارة المستفيدين\n- التحقق من أسعار الصرف\n\nكيف يمكنني مساعدتك اليوم؟"
-        : "Hello! I'm your AJB Bank AI Assistant. I can help you with:\n\n- View account balances\n- Make transfers\n- Manage beneficiaries\n- Check exchange rates\n\nHow can I assist you today?";
-
-    return {
-        id: 'welcome',
-        role: 'assistant',
-        content,
-        timestamp: new Date().toISOString(),
-    };
-}
-
 export function useChatViewModel(options: UseChatViewModelOptions = {}) {
     const { locale = 'en' } = options;
 
-    const [messages, setMessages] = useState<ChatMessage[]>([getWelcomeMessage(locale)]);
+    const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [isTranscribing, setIsTranscribing] = useState(false);
     const [sessionId, setSessionId] = useState(() => `session-${Date.now()}`);
@@ -109,14 +96,23 @@ export function useChatViewModel(options: UseChatViewModelOptions = {}) {
             // Stop any ongoing recording first
             disposeRecording();
 
-            // Reset messages with new welcome message
-            setMessages([getWelcomeMessage(locale)]);
+            // Reset messages to empty (WelcomeView will show)
+            setMessages([]);
             setSessionId(`session-${Date.now()}`);
 
             // Reset disposed flag for new locale
             isDisposedRef.current = false;
         }
     }, [locale, disposeRecording]);
+
+    // Reset chat (new session)
+    const resetChat = useCallback(() => {
+        console.log(`[useChatViewModel:${instanceIdRef.current}] Resetting chat (new session)`);
+        disposeRecording();
+        setMessages([]);
+        setSessionId(`session-${Date.now()}`);
+        isDisposedRef.current = false;
+    }, [disposeRecording]);
 
     const sendMessage = useCallback(async (content: string) => {
         // Don't send if disposed
@@ -292,6 +288,7 @@ export function useChatViewModel(options: UseChatViewModelOptions = {}) {
         isLoading,
         isTranscribing,
         sendMessage,
+        resetChat,
         isRecording,
         startRecording,
         stopRecording,
