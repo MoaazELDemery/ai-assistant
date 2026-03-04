@@ -23,6 +23,7 @@ export function ChatScreen() {
     const lastMessageIdRef = useRef<string | null>(null);
     const prevLocaleRef = useRef(locale);
     const speechTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const hasSpokenWelcomeRef = useRef(false);
 
     // Compute welcome summary from mock data
     const welcomeSummary = useMemo<WelcomeSummary>(() => {
@@ -69,8 +70,29 @@ export function ChatScreen() {
             prevLocaleRef.current = locale;
             stopAllSpeech(); // Stop all speech (current + pending)
             lastMessageIdRef.current = null; // Reset so welcome message can be spoken
+            hasSpokenWelcomeRef.current = false; // Reset for welcome speech
         }
     }, [locale, stopAllSpeech]);
+
+    // Auto-speak welcome message
+    useEffect(() => {
+        if (!autoSpeak || messages.length > 0 || hasSpokenWelcomeRef.current) return;
+
+        hasSpokenWelcomeRef.current = true;
+
+        const clientName = locale === 'ar' ? 'محمد' : 'Mohammed';
+        const greeting = locale === 'ar' ? `هلا ${clientName}` : `Hello, ${clientName}!`;
+        const subGreeting = locale === 'ar' ? 'كيف اقدر افيدك اليوم ؟' : 'How can I help you today?';
+        const fullGreeting = `${greeting} ${subGreeting}`;
+
+        cancelPendingSpeech();
+        stop();
+
+        speechTimeoutRef.current = setTimeout(() => {
+            speechTimeoutRef.current = null;
+            speak(fullGreeting, 'welcome-speech');
+        }, 800);
+    }, [messages, autoSpeak, speak, stop, cancelPendingSpeech, locale]);
 
     // Auto-speak new assistant messages
     useEffect(() => {
@@ -132,6 +154,7 @@ export function ChatScreen() {
 
     const handleNewSession = () => {
         stopAllSpeech();
+        hasSpokenWelcomeRef.current = false;
         resetChat();
     };
 
